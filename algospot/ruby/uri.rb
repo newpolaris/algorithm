@@ -1,0 +1,1 @@
+gets.to_i.times{print gets.gsub(/%(..)/){$1.hex.chr}}
