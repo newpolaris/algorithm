@@ -1,9 +1,13 @@
 #include <string.h>
+#include <algorithm>
+#include <functional>
 #include <vector>
 #include <iostream>
 #include <fstream>
 
 using namespace std;
+
+const int MAX_ELEM = 987654321;
 
 vector<int> S[10] = {
 	{0, 1, 2},
@@ -16,19 +20,6 @@ vector<int> S[10] = {
 	{4, 5, 7, 14, 15},
 	{1, 2, 3, 4, 5},
 	{3, 4, 5, 9, 13},
-};
-
-vector<pair<int, int>> M = {
-	{ 13, 9 },
-	{ 12, 4 },
-	{ 11, 1 },
-	{ 10, 2 },
-	{ 19, 7 },
-	{ 6, 3 },
-	{ 14, 5 },
-	{ 5, 8 },
-	{ 1, 0 },
-	{ 3, 6 },
 };
 
 void set(vector<int>& clock, vector<int>& s, int count)
@@ -46,26 +37,28 @@ void reset(vector<int>& clock, vector<int>& s, int count)
 
 int sync(vector<int>& clock, int n, int c)
 {
-	for (int i = 0; i < clock.size(); i++)
-		clock[i] = (clock[i] + 4) % 4;
-
 	if (n == 10)
-		return c;
+	{
+		if (all_of(clock.begin(), clock.end(), 
+					[](int k) { return k % 4 == 0; }))
+			return c;
+		return MAX_ELEM;
+	}
 
-	if (clock[n] == 0)
-		return sync(clock, n+1, c);
-
-	int count = clock[M[n].first];
-
-	set(clock, S[M[n].second], count);
-
-	return sync(clock, n+1, c+count);
+	int ret = MAX_ELEM;
+	for (int i = 0; i < 4; i++)
+	{
+		set(clock, S[n], i);
+		ret = min(ret, sync(clock, n+1, c+i));
+		reset(clock, S[n], i);
+	}
+	return ret;
 }
 
 int main()
 {
-#if 1//_DEBUG
-	ifstream fin("input.txt");
+#if _DEBUG
+	ifstream fin("clocksync.in");
 	istream& in = fin;
 #else
 	istream& in = cin;
@@ -82,13 +75,10 @@ int main()
 			in >> T;
 			e = (4 - T/3);
 		}
-
-		int result = sync(clock, 0, 0);
-		auto it = max_element(clock.begin(), clock.end());
-		if (*it != 0)
-			result = -1;
-
-		cout << result << endl;
+		int ret = sync(clock, 0, 0);
+		if (ret == MAX_ELEM)
+			ret = -1;
+		cout << ret << endl;
 	}
 	
 	return 0;
