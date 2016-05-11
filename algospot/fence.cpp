@@ -1,6 +1,4 @@
-#include <string.h>
 #include <algorithm>
-#include <functional>
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -9,47 +7,33 @@ using namespace std;
 
 vector<int> fence;
 
-int maxBox(int s, int e)
+int solve(int left, int right)
 {
-	if (s+1 == e)
-		return fence[s];
+	if (left >= right)
+		return fence[left];
 
-	if (s >= e)
-		return 0;
+	int mid = (left+right)/2;
+	int lo = mid, hi = mid+1;
+	int ret = max(solve(left, lo), solve(hi, right));
 
-	int mid = (s+e)/2;
-	int l = mid;
-	int r = mid+1;
-	int Box = 0;
-
-	while (true)
+	while (lo >= left || hi <= right)
 	{
-		if (l < s && r > e - 1)
-			break;
-
 		int target = 0;
+		if (lo >= left)
+			target = fence[lo];
+		if (hi <= right)
+			target = max(target, fence[hi]);
 
-		if (l >= s)
-			target = fence[l];
-		if (r <= e - 1)
-			target = max(target, fence[r]);
+		while (lo >= left && target <= fence[lo])
+			lo--;
 
-		while (l >= s && target <= fence[l])
-			l--;
+		while (hi <= right && target <= fence[hi])
+			hi++;
 
-		while (r <= e - 1 && target <= fence[r])
-			r++;
-
-		int lc = (mid - l);
-		int rc = (r - mid - 1);
-
-		Box = max(Box, (lc + rc)*target);
+		ret = max(ret, (hi - lo - 1)*target);
 	}
 
-	Box = max(Box, maxBox(s, (s+e)/2));
-	Box = max(Box, maxBox((s+e)/2+1, e));
-
-	return Box;
+	return ret;
 }
 
 int main()
@@ -71,7 +55,7 @@ int main()
 		for (auto& f : fence)
 			in >> f;
 
-		cout << maxBox(0, N) << endl;
+		cout << solve(0, N-1) << endl;
 	}
 	
 	return 0;
