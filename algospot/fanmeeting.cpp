@@ -50,7 +50,7 @@ int solve(const string& Fan, const string& Idol)
 
 int main()
 {
-#if 1//_DEBUG
+#if 1 //_DEBUG
 	ifstream fin("fanmeeting-large.in");
 	istream& in = fin;
 #else
