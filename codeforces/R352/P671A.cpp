@@ -15,11 +15,10 @@ inline double dist(double ax, double ay, double bx, double by)
 	return sqrt((ax - bx)*(ax - bx) + (ay - by)*(ay - by));
 }
 
-#define DIST(ax, ay, bx, by) 
 int main()
 {
 #if _DEBUG
-	ifstream fin("P671A.in");
+	ifstream fin("P672C.in");
 	istream& in = fin;
 #else
 	istream& in = cin;
@@ -29,33 +28,29 @@ int main()
 	in >> ax >> ay >> bx >> by >> tx >> ty;
 	in >> n;
 
-	vector<double> trashbin(n);
-	vector<pair<double, int>> adil(n);
-	vector<pair<double, int>> bera(n);
+	vector<pair<double, int>> adil;
+	vector<pair<double, int>> bera;
 
+	double sum = 0.0;
 	for (int i = 0; i < n; i++)
 	{
 		in >> x >> y;
-		trashbin[i] = dist(tx, ty, x, y);
-		adil[i] = { trashbin[i] - dist(ax, ay, x, y), i };
-		bera[i] = { trashbin[i] - dist(bx, by, x, y), i };
+		double d = dist(tx, ty, x, y);
+		sum += d * 2;
+		adil.emplace_back(dist(ax, ay, x, y) - d, i);
+		bera.emplace_back(dist(bx, by, x, y) - d, i);
 	}
 
-	double sum = accumulate(trashbin.begin(), trashbin.end(), 0.0) * 2;
+	sort(adil.begin(), adil.end());
+	sort(bera.begin(), bera.end());
 
-	sort(adil.begin(), adil.end(), greater<pair<double, int>>());
-	sort(bera.begin(), bera.end(), greater<pair<double, int>>());
-
-	double minsum = min(sum-adil[0].first, sum-bera[0].first);
-	if (adil[0].second == bera[0].second)
-	{
-		minsum = min(minsum, sum - adil[0].first - bera[1].first);
-		minsum = min(minsum, sum - adil[1].first - bera[0].first);
-	}
+	double minsum = sum;
+	if (adil[0].second != bera[0].second)
+		minsum += adil[0].first + bera[0].first;
 	else
-	{
-		minsum = min(minsum, sum - adil[0].first - bera[0].first);
-	}
+		minsum += min(adil[0].first + bera[1].first, adil[1].first + bera[0].first);
+
+	minsum = min(minsum, min(sum + adil[0].first, sum + bera[0].first));
 
 	cout << fixed << setprecision(15);
 	cout << minsum << endl;
