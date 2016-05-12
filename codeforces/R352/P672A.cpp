@@ -12,12 +12,9 @@ int main()
 	cin >> A;
 
 	string B;
-	for (int i = 1; i <= 1000; i++)
-	{
-		B += to_string(i);
-		if (B.size() > 1000)
-			break;
-	}
+	int i = 1;
+	while (B.size() <= 1000)
+		B += to_string(i++);
 
 	cout << B[A-1] << endl;
 	return 0;
