@@ -8,30 +8,6 @@ using namespace std;
 
 typedef long long ll;
 
-void doit(vector<int>& A, int k)
-{
-	sort(A.begin(), A.end());
-	int mn = A[0];
-	for (ll i = 1; i < A.size(); i++)
-	{
-		ll need = (A[i] - mn) * i;
-		if (need <= k)
-		{
-			mn = A[i];
-			k -= need;
-		}
-	}
-	
-	auto ub = upper_bound(A.begin(), A.end(), mn);
-	auto dist = distance(A.begin(), ub);
-
-	auto factor = k / dist;
-	auto remainer = k % dist;
-	
-	fill(A.begin(), ub, mn + factor);
-	for_each(A.begin(), A.begin() + remainer, [](int& a) { a++; });
-}
-
 int main()
 {
 #if _DEBUG
@@ -49,13 +25,66 @@ int main()
 	for (auto& a : A)
 		in >> a;
 
-	doit(A, k);
-	for_each(A.begin(), A.end(), [](int& a) { a = -a; });
-	doit(A, k);
-	for_each(A.begin(), A.end(), [](int& a) { a = -a; });
-	
-	auto pr = minmax_element(A.begin(), A.end());
+	ll hi; 
+	ll lo; 
+	hi = 2e9;
+	lo = 1;
+	while (lo < hi)
+	{
+		int mid = (lo + hi) / 2;
+		if (mid == lo)
+			break;
+		ll sum = 0;
+		for (int i = 0; i < n; i++)
+			sum += max(mid - A[i], 0);
+		if (sum <= k)
+			lo = mid;
+		else
+			hi = mid;
+	}
 
+	ll t = k;
+	for (int i = 0; i < n; i++)
+	{
+		t -= max(0LL, lo - A[i]);
+		A[i] = max((ll)A[i], lo);
+	}
+
+	for (int i = 0; i < n; i++)
+		if (A[i] == lo and t) {
+			t--;
+			A[i]++;
+		}
+
+	hi = 2e9;
+	lo = 1;
+
+	while (lo < hi)
+	{
+		int mid = (lo + hi) / 2;
+		ll sum = 0;
+		for (int i = 0; i < n; i++)
+			sum += max(A[i] - mid, 0);
+		if (sum <= k)
+			hi = mid;
+		else
+			lo = mid + 1;
+	}
+
+	t = k;
+	for (int i = 0; i < n; i++)
+	{
+		t -= max(0LL, A[i] - lo);
+		A[i] = min((ll)A[i], lo);
+	}
+
+	for (int i = 0; i <= n; i++)
+		if (A[i] == lo and t) {
+			t--;
+			A[i]--;
+		}
+
+	auto pr = minmax_element(A.begin(), A.end());
 	cout << (*pr.second - *pr.first) << endl;
 
 	return 0;
