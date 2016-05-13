@@ -12,6 +12,7 @@ int main()
 	ifstream fin("P672C.in");
 	istream& in = fin;
 #else
+	cin.sync_with_stdio(0);
 	istream& in = cin;
 #endif
 
