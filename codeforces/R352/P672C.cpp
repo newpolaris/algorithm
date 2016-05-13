@@ -33,14 +33,14 @@ int main()
 	{
 		int mid = (lo + hi) / 2;
 		if (mid == lo)
-			break;
+			mid++;
 		ll sum = 0;
 		for (int i = 0; i < n; i++)
 			sum += max(mid - A[i], 0);
 		if (sum <= k)
 			lo = mid;
 		else
-			hi = mid;
+			hi = mid - 1;
 	}
 
 	ll t = k;
