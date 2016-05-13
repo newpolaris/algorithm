@@ -1,33 +1,62 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
-long long a[500100], sum, pre;
-int n, k;
+typedef long long ll;
+
+void doit(vector<int>& A, int k)
+{
+	sort(A.begin(), A.end());
+	int mn = A[0];
+	for (ll i = 1; i < A.size(); i++)
+	{
+		ll need = (A[i] - mn) * i;
+		if (need <= k)
+		{
+			mn = A[i];
+			k -= need;
+		}
+	}
+	
+	auto ub = upper_bound(A.begin(), A.end(), mn);
+	auto dist = distance(A.begin(), ub);
+
+	auto factor = k / dist;
+	auto remainer = k % dist;
+	
+	fill(A.begin(), ub, mn + factor);
+	for_each(A.begin(), A.begin() + remainer, [](int& a) { a++; });
+}
 
 int main()
 {
-    scanf("%d%d", &n, &k);
-    for (int i = 0; i < n; i++)
-        scanf("%I64d", &a[i]);
-    for (int i = 0; i < n; i++)
-        sum += a[i];
-    sort(a, a + n);
-    long long mn = a[0], mx = a[n - 1], kk = k;
-    for (int i = n - 1; i >= 0; i--) {
-        if (a[i] >= mx)
-            continue;
-        long long tmp = min(mx - a[i], kk / (n - i - 1));
-        mx -= tmp;
-        kk -= tmp * (n - i - 1);
-    }
-    kk = k;
-    for (int i = 0; i <= n - 1; i ++) {
-        if (a[i] <= mn)
-            continue;
-        long long tmp = min(a[i] - mn, kk / i);
-        mn += tmp;
-        kk -= tmp * i;
-    }
-    printf("%I64d\n", max(sum % n ? 1LL : 0LL, mx - mn));
+#if _DEBUG
+	ifstream fin("P672C.in");
+	istream& in = fin;
+#else
+	cin.sync_with_stdio(0);
+	istream& in = cin;
+#endif
+
+	int n, k;
+	in >> n >> k;
+
+	vector<int> A(n);
+	for (auto& a : A)
+		in >> a;
+
+	doit(A, k);
+	for_each(A.begin(), A.end(), [](int& a) { a = -a; });
+	doit(A, k);
+	for_each(A.begin(), A.end(), [](int& a) { a = -a; });
+	
+	auto pr = minmax_element(A.begin(), A.end());
+
+	cout << (*pr.second - *pr.first) << endl;
+
+	return 0;
 }
