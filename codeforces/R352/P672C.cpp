@@ -1,41 +1,33 @@
-#include <iostream>
-#include <fstream>
-#include <algorithm>
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
+long long a[500100], sum, pre;
 int n, k;
-long long sum = 0;
 
 int main()
 {
-	cin.sync_with_stdio(0);
-	cin >> n >> k;
-	vector<int> A(n);
-	for (auto& a : A)
-		cin >> a;
-	sort(A.begin(), A.end());
-	int mx = A[n - 1], mn = A[0], kk = k;
-	for (int i = n - 2; i >= 0; --i)
-	{
-		if (A[i] >= mx) 
-			continue;
-		int e = n - i - 1;
-		int c = min(mx - A[i], kk / e);
-		mx -= c;
-		kk -= c * e;
-	}
-	kk = k;
-	for (int i = 1; i < n; i++)
-	{
-		if (A[i] <= mn) 
-			continue;
-		int c = min(A[i] - mn, kk / i);
-		mn += c;
-		kk -= c * i;
-	}
-	for (int i = 0; i < A.size(); i++)
-		sum += A[i];
-	cout << max(sum % n ? 1 : 0, mx - mn) << endl;
+    scanf("%d%d", &n, &k);
+    for (int i = 0; i < n; i++)
+        scanf("%I64d", &a[i]);
+    for (int i = 0; i < n; i++)
+        sum += a[i];
+    sort(a, a + n);
+    long long mn = a[0], mx = a[n - 1], kk = k;
+    for (int i = n - 1; i >= 0; i--) {
+        if (a[i] >= mx)
+            continue;
+        long long tmp = min(mx - a[i], kk / (n - i - 1));
+        mx -= tmp;
+        kk -= tmp * (n - i - 1);
+    }
+    kk = k;
+    for (int i = 0; i <= n - 1; i ++) {
+        if (a[i] <= mn)
+            continue;
+        long long tmp = min(a[i] - mn, kk / i);
+        mn += tmp;
+        kk -= tmp * i;
+    }
+    printf("%I64d\n", max(sum % n ? 1LL : 0LL, mx - mn));
 }
