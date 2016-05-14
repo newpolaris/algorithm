@@ -15,25 +15,21 @@ vector<vector<FP>> M;
 vector<FP> Order;
 int C, N, D, P;
 
-double search(int here, int days, FP percent)
+double search(int here, int days)
 {
 	double& ret = cache[here][days];
 	if (ret > -0.5)
 		return ret;
 
 	if (days == 0)
-	{
-		if (here == P)
-			return percent;
-		return 0.0;
-	}
+		return (here == P ? 1.0 : 0.0);
 
 	ret = 0.0;
 	for (int n = 0; n < N; n++)
 	{
 		if (!M[here][n])
 			continue;
-		ret += search(n, days-1, percent/Order[n]);
+		ret += search(n, days-1)/Order[n];
 	}
 
 	return ret;
@@ -73,9 +69,6 @@ int main()
 		for (int d = 0; d <= D; d++)
 			cache[n][d] = -1.0;
 
-		for (int n = 0; n < N; n++)
-			search(n, D, 1.0);
-
 		int T;
 		in >> T;
 		vector<int> TL(T);
@@ -84,7 +77,7 @@ int main()
 
 		cout << fixed << setprecision(8);
 		for (int i = 0; i < TL.size(); i++)
-			cout << cache[TL[i]][D] << " \n"[i == T - 1];
+			cout << search(TL[i], D) << " \n"[i == T - 1];
 	}
 	
 	return 0;
