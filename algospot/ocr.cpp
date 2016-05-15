@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <vector>
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <algorithm>
 #include <string.h>
@@ -33,13 +31,9 @@ FP GetTP(int step, int i, int prev)
 
 FP search(int step, int prev)
 {
-	if (step == n)
-		return 0.0;
-
+	if (step == n) return 0.0;
 	FP& ret = cache[step][prev];
-	if (ret < 1.0)
-		return ret;	
-
+	if (ret < 1.0) return ret;	
 	ret = -INF;
 	for (int i = 0; i < m; i++)
 	{
@@ -57,54 +51,51 @@ FP search(int step, int prev)
 	return ret;
 }
 
-void reconstruct(vector<int>& L, int prev, int step)
+string reconstruct(vector<string>& R, int prev, int step)
 {
-	if (L.size() == S.size())
-		return;
+	if (step == S.size()) return "";
 	int Next = choose[step][prev];
-	L.push_back(Next);
-	reconstruct(L, Next, step+1);
+	return R[Next] + " " + reconstruct(R, Next, step+1);
 }
 
+char buf[11];
 int main()
 {
 #if _DEBUG
 	freopen("ocr.in", "r", stdin);
 #endif
-
-	char ss[11];
 	FP dd;
 
 	scanf("%d%d", &m, &q); 
 
-	vector<string> R(m);
-	for (auto& r : R)
+	vector<string> R;
+	for (int i = 0; i < m; i++)
 	{
-		scanf("%s", ss);
-		r = string(ss);
+		scanf("%s", buf);
+		R.push_back(buf);
 	}
 
 	B = vector<FP>(m);
 	for (int c = 0; c < m; c++)
 	{
-		scanf("%f", &dd);
-		B[c] = log10(dd);
+		scanf("%f", &B[c]);
+		B[c] = log10(B[c]);
 	}
 
 	T = vector<vector<FP>>(m, vector<FP>(m));
 	for (int r = 0; r < m; r++)
 	for (int c = 0; c < m; c++)
 	{
-		scanf("%f", &dd);
-		T[r][c] = log10(dd);
+		scanf("%f", &T[r][c]);
+		T[r][c] = log10(T[r][c]);
 	}
 
 	M = vector<vector<FP>>(m, vector<FP>(m));
 	for (int r = 0; r < m; r++)
 	for (int c = 0; c < m; c++)
 	{
-		scanf("%f", &dd);
-		M[r][c] = log10(dd);
+		scanf("%f", &M[r][c]);
+		M[r][c] = log10(M[r][c]);
 	}
 
 	while (q--)
@@ -116,22 +107,17 @@ int main()
 		memset(&choose, -1, sizeof(choose));
 
 		scanf("%d", &n);
-		S = vector<int>(n);
-		for (auto& i : S)
+		S.clear();
+		for (int i = 0; i < n; i++)
 		{
-			scanf("%s", ss);
-			string s(ss);
-			auto it = find(R.begin(), R.end(), s);
-			i = distance(R.begin(), it);
+			scanf("%s", buf);
+			auto it = find(R.begin(), R.end(), buf);
+			S.push_back(distance(R.begin(), it));
 		}
 
 		search(0, 0);
-		vector<int> L;
-		reconstruct(L, 0, 0);
-
-		for (int i = 0; i < L.size(); i++)
-			printf("%s ", R[L[i]].c_str());
-		printf("\n");
+		string sol = reconstruct(R, 0, 0);
+		printf("%s\n", sol.c_str());
 	}
 
 	return 0;
