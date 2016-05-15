@@ -17,7 +17,7 @@ void calcBino()
 	memset(bino, 0, sizeof(bino));
 	for (int i = 0; i < 201; i++)
 	{
-		bino[i][0] = bino[i][1] = 1;
+		bino[i][0] = bino[i][i] = 1;
 		for (int j = 1; j < i; j++)
 		{
 			bino[i][j] = min(B, bino[i-1][j-1] + bino[i-1][j]);
@@ -27,16 +27,16 @@ void calcBino()
 
 void Generate(int n, int m, string s)
 {
+	if (K < 0) return;
 	if (n == 0 && m == 0)
 	{
-		if (--K == 0)
-		{
+		if (K == 0)
 			cout << s << endl;
-		}
+		--K;
 		return;
 	}
 
-	if (bino[n+m][n] < K) 
+	if (bino[n+m][n] <= K) 
 	{
 		K -= bino[n+m][n];
 		return;
@@ -62,6 +62,7 @@ int main()
 	while (C--)
 	{
 		in >> N >> M >> K;
+		--K;
 		Generate(N, M, "");
 	}
 	
