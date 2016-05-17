@@ -7,69 +7,44 @@
 using namespace std;
 
 typedef long long ll;
-vector<ll> L;
-int LeafStart;
-int n, m, k;
 
-ll init(int C)
+// 0 <= L, R <= A.size()
+// 0 <= S, E <= L.size()
+
+ll init(const vector<ll>& A, vector<ll>& T, int N, int L, int R)
 {
-	if (LeafStart <= C)
-		return L[C];
-	L[C] = init(C * 2 + 1) + init(C * 2 + 2);
-	return L[C];
+	if (L == R)
+		return T[N] = A[L];
+	int M = (L + R) / 2;
+	return T[N] = init(A, T, N * 2, L, M) + init(A, T, N * 2 + 1, M+1, R);
 }
 
 
-ll sum(int C, int RS, int RE, int S, int E)
+void update(vector<ll>& T, int N, int S, int E, int I, ll Diff)
 {
-	if (E > RE || S < RS) return 0LL;
-	if (S > E) return 0LL;
+	if (S > I || E < I) return;
 
-	if (RS == S && RE == E)
-		return L[C];
+	T[N] += Diff;
 
-	int Mid = (RS + RE)/2;
-
-	ll total = 0;
-	total += sum(C * 2 + 1, RS, Mid, S, min(E, Mid));
-	total += sum(C * 2 + 2, Mid + 1, RE, max(S, Mid + 1), E);
-	return total;
-}
-
-ll Sum(int S, int E)
-{
-	return sum(0, 0, LeafStart, S - 1, E - 1);
-}
-
-void update(int C, int Level, int T, int V)
-{
-	int TotalLen = LeafStart + 1;
-	int Len = TotalLen / Level;
-	int Count = (C - Level + 1);
-	int RS = Len * Count;
-	int RE = RS + Len - 1;
-
-	if (RS > T) return;
-	if (RE < T) return;
-	if (RS == RE && RS == T)
+	if (S != E)
 	{
-		L[C] = V;
-		return;
+		int M = (S + E) / 2;
+		update(T, N * 2, S, M, I, Diff);
+		update(T, N * 2 + 1, M + 1, E, I, Diff);
 	}
-
-	int LC = C * 2 + 1;
-	int RC = C * 2 + 2;
-
-	update(LC, Level*2, T, V);
-	update(RC, Level*2, T, V);
-
-	L[C] = L[LC] + L[RC];
 }
-
-void Update(int L, int V)
+ll sum(const vector<ll>& T, int N, int S, int E, int L, int R)
 {
-	update(0, 1, L - 1, V);
+	if (L > E || R < S) return 0LL;
+
+	if (L <= S && E <= R)
+		return T[N];
+
+	int M = (S + E)/2;
+
+	return sum(T, N * 2, S, M, L, R) + sum(T, N * 2 + 1, M + 1, E, L, R);
 }
+
 
 int main()
 {
@@ -80,29 +55,35 @@ int main()
 	istream& in = cin;
 #endif
 
+	int n, m, k;
+
 	in >> n >> m >> k;
-	vector<ll> N(n);
-	for (auto& e : N)
-		in >> e;
+	vector<ll> A(n);
+	for (auto& a : A)
+		in >> a;
 
 	int h = ceil(log2(n));
-	int size = pow(2.0, h+1);
-	LeafStart = pow(2.0, h) - 1;
-	L = vector<ll>(size);
-	copy(N.begin(), N.end(), L.begin() + LeafStart);
+	int size = 1 << (h+1);
 
-	init(0);
+	vector<ll> T(size);
+
+	init(A, T, 1, 0, n - 1);
 
 	m += k;
-	while (m--)
-	{
-		int a, b, c;
-		in >> a >> b >> c;
-
-		if (a == 1)
-			Update(b, c);
-		else if (a == 2)
-			cout << Sum(b, c) << endl;
+	while (m--) {
+		int t1, t2;
+		ll t3;
+		in >> t1 >> t2;
+		in >> t3;
+		if (t1 == 1) {
+			t2-=1;
+			long long diff = t3-A[t2];
+			A[t2] = t3;
+			update(T, 1, 0, n-1, t2, diff);
+		} else if (t1 == 2) {
+			printf("%lld\n",sum(T, 1, 0, n-1, t2-1, t3-1));
+		}
 	}
 	return 0;
 }
+
