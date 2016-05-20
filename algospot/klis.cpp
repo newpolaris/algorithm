@@ -1,5 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
-
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -17,70 +15,54 @@ int L[500];
 int cache[501];
 ll ccache[501];
 
+const ll max_k = (ll)numeric_limits<int>::max() + 10;
+
 int lis(int S)
 {
 	int& ret = cache[S+1];
-	if (ret >= 0) return ret;
+	if (ret != -1) return ret;
 
-	ret = 0;
-
+	ret = 1;
 	for (int s = S+1; s < N; s++)
-	{
 		if (S == -1 || L[S] < L[s])
-		{
 			ret = max(ret, 1 + lis(s));
-		}
-	}
 	return ret;
 }
-
-ll max_k = (ll)numeric_limits<int>::max() + 10;
 
 ll count(int S)
 {
 	ll& ret = ccache[S + 1];
 	if (ret >= 0) return ret;
 
-	if (lis(S) == 0)
+	if (lis(S) == 1)
 		return ret = 1;
+
 	ret = 0;
 	for (int s = S + 1; s < N; s++)
-	{
 		if (lis(S) == lis(s) + 1 && (S == -1 || L[S] < L[s]))
-		{
 			ret = min(max_k, ret + count(s));
-		}
-	}
 	return ret;
 }
 
-void kth(vector<int>& A, int S, ll k)
+void kth(int S, ll k)
 {
-	int i = 0;
+	if (S != -1) printf("%d ", L[S]);
 
 	vector<pair<int, int>> T;
 	for (int s = S + 1; s < N; s++)
-	{
 		if (lis(S) == lis(s) + 1 && (S == -1 || L[S] < L[s]))
-		{
 			T.emplace_back(L[s], s);
-		}
-	}
 	sort(T.begin(), T.end());
 
-	int t, a;
-	for (t = 0; t < T.size(); t++)
+	for (int t = 0; t < T.size(); t++)
 	{
-		a = T[t].second;
-		ll c = ccache[a + 1];
+		int a = T[t].second;
+		ll c = count(a);
 		if (k + c < K)
-		{
 			k += c;
-		}
 		else
 		{
-			kth(A, a, k);
-			A.push_back(L[a]);
+			kth(a, k);
 			break;
 		}
 	}
@@ -108,12 +90,9 @@ int main()
 		lis(-1);
 		count(-1);
 
-		vector<int> A;
-		kth(A, -1, 0);
-
-		printf("%lu\n", A.size());
-		for (int i = A.size() - 1; i >= 0; --i)
-			printf("%d%c", A[i], " \n"[i == 0]);
+		printf("%d\n", lis(-1) - 1);
+		kth(-1, 0);
+		printf("\n");
 	}
 
 	return 0;
