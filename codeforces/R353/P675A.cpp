@@ -20,10 +20,7 @@ int main()
 		return 0;
 	}
 
-	bool bPossible = (b - a) / c >= 0;
-	bPossible &= ((b - a) % c) == 0;
-
-	cout << (bPossible ? "YES" : "NO") << endl;
+	cout << ((b - a) / c >= 0 && ((b - a) % c) == 0 ? "YES" : "NO") << endl;
 
 	return 0;
 }
