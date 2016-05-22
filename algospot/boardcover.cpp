@@ -73,8 +73,8 @@ int cover(vector<vector<int>>& M)
 
 int main()
 {
-#if 0//NDEBUG
-	ifstream fin("input.txt");
+#if _DEBUG
+	ifstream fin("boardcover.in");
 	istream& in = fin;
 #else
 	istream& in = cin;
