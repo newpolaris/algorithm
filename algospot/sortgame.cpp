@@ -11,7 +11,6 @@ typedef vector<int> vi;
 int dist[40320];
 const int maxN = 8;
 
-// perm 이 map 보다는 30번 기준 0.6 vs 3.0으로 5배 빠르다.
 int perm(const vi& in)
 {
 	int index = 0;
@@ -55,16 +54,16 @@ int GetReverse(const vi& L)
 		auto here = q.front();
 		q.pop();
 
-		int distHere = perm(here);
-		for (int i = 2; i <= N; i++)
+		int idxHere = perm(here);
+		for (int i = 2; i <= maxN; i++)
 		{
-			for (int j = 0; j <= N - i; j++)
+			for (int j = 0; j + i <= maxN; j++)
 			{
 				reverse(here.begin() + j, here.begin() + i + j);
-				int distThere = perm(here);
-				if (dist[distThere] == -1)
+				int idxThere = perm(here);
+				if (dist[idxThere] == -1)
 				{
-					dist[distThere] = dist[distHere] + 1;
+					dist[idxThere] = dist[idxHere] + 1;
 					q.push(here);
 				}
 				reverse(here.begin() + j, here.begin() + i + j);
