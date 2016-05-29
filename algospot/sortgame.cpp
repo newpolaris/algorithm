@@ -9,6 +9,7 @@
 using namespace std;
 typedef vector<int> vi;
 
+// perm 이 map 보다는 30번 기준 0.6 vs 3.0으로 5배 빠르다.
 int perm(const vi& in)
 {
 	int index = 0;
