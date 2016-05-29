@@ -5,26 +5,25 @@
 #include <map>
 #include <algorithm>
 #include <queue>
+#include <string.h>
+#include <assert.h>
 
 using namespace std;
 typedef vector<int> vi;
 
-// perm 이 map 보다는 30번 기준 0.6 vs 3.0으로 5배 빠르다.
+int dist[1<<24];
+
+// bit 버전
 int perm(const vi& in)
 {
-	int index = 0;
-	int position = 1;
-	int factor = 1;
-	for (int i = in.size() - 2; i >= 0; i--)
+	int ret = 0;
+	for (int i = in.size() - 1; i >= 0; --i)
 	{
-		int count = 0;
-		for (int k = i + 1; k < in.size(); k++)
-			if (in[i] < in[k])
-				count++;
-		index += count*factor;
-		factor *= ++position;
+		assert(in[i] < 8);
+		int shift = (in.size() - 1 - i) * 3;
+		ret += (in[i] << shift);
 	}
-	return index;
+	return ret;
 }
 
 int GetReverse(const vi& L)
@@ -37,12 +36,7 @@ int GetReverse(const vi& L)
 	queue<vi> q;
 	q.push(L);
 
-
-	int Length = 1;
-	for (int i = 2; i <= N; i++)
-		Length *= i;
-
-	vi dist(Length, -1);
+	memset(dist, -1, sizeof(dist));
 	dist[perm(L)] = 0;
 
 	while (!q.empty())
@@ -73,6 +67,20 @@ int GetReverse(const vi& L)
 	return -1;
 }
 
+vi remap(const vi& L)
+{
+	vector<pair<int,int>> VP;
+	for (int i = 0; i < L.size(); i++)
+		VP.push_back({L[i], i});
+	sort(VP.begin(), VP.end());
+
+	vi R(L.size());
+	for (int i = 0; i < L.size(); i++)
+		R[VP[i].second] = i;
+
+	return R;
+}
+
 int main()
 {
 #ifdef _DEBUG
@@ -89,7 +97,10 @@ int main()
 		for (auto& l : L)
 			scanf("%d", &l);
 
-		printf("%d\n", GetReverse(L));
+		L = remap(L);
+
+		for (int i = 0; i < 30; i++)
+			printf("%d\n", GetReverse(L));
 	}
 
 	return 0;
