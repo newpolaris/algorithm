@@ -5,47 +5,55 @@
 #include <map>
 #include <algorithm>
 #include <queue>
-#include <string.h>
-#include <assert.h>
 
 using namespace std;
 typedef vector<int> vi;
+int dist[40320];
+const int maxN = 8;
 
-int dist[1<<24];
-
-// bit 버전
+// perm 이 map 보다는 30번 기준 0.6 vs 3.0으로 5배 빠르다.
 int perm(const vi& in)
 {
-	int ret = 0;
-	for (int i = in.size() - 1; i >= 0; --i)
+	int index = 0;
+	int position = 1;
+	int factor = 1;
+	for (int i = in.size() - 2; i >= 0; i--)
 	{
-		assert(in[i] < 8);
-		int shift = (in.size() - 1 - i) * 3;
-		ret += (in[i] << shift);
+		int count = 0;
+		for (int k = i + 1; k < in.size(); k++)
+			if (in[i] > in[k])
+				count++;
+		index += count*factor;
+		factor *= ++position;
 	}
-	return ret;
+	return index;
 }
 
 int GetReverse(const vi& L)
 {
-	int N = L.size();
+	vector<int> S(maxN);
+	for (int i = 0; i < S.size(); i++) S[i] = i;
 
-	auto ans = L;
-	sort(ans.begin(), ans.end());
+	int N = L.size();
+	vector<pair<int,int>> pi;
+	for (int i = 0; i < N; i++)
+		pi.push_back({L[i], i});
+	sort(pi.begin(), pi.end());
+
+	vector<int> ans = S;
+	for (int i = 0; i < N; i++)
+		ans[i] = pi[i].second;
 
 	queue<vi> q;
-	q.push(L);
+	q.push(S);
 
-	memset(dist, -1, sizeof(dist));
-	dist[perm(L)] = 0;
+	int& d = dist[perm(ans)];
+	if (d != -1) return d;
 
 	while (!q.empty())
 	{
 		auto here = q.front();
 		q.pop();
-
-		if (here == ans)
-			return dist[perm(ans)];
 
 		int distHere = perm(here);
 		for (int i = 2; i <= N; i++)
@@ -64,32 +72,21 @@ int GetReverse(const vi& L)
 		}
 	}
 
-	return -1;
-}
-
-vi remap(const vi& L)
-{
-	vector<pair<int,int>> VP;
-	for (int i = 0; i < L.size(); i++)
-		VP.push_back({L[i], i});
-	sort(VP.begin(), VP.end());
-
-	vi R(L.size());
-	for (int i = 0; i < L.size(); i++)
-		R[VP[i].second] = i;
-
-	return R;
+	return d;
 }
 
 int main()
 {
 #ifdef _DEBUG
-	//freopen("/Users/newpolaris/Projects/algorithm/algospot/sortgame.in", "r", stdin);
 	freopen("sortgame.in", "r", stdin);
 #endif
 
 	int C, N;
 	scanf("%d", &C);
+
+	memset(dist, -1, sizeof(dist));
+	dist[0] = 0;
+
 	while (C--)
 	{
 		scanf("%d", &N);
@@ -97,10 +94,7 @@ int main()
 		for (auto& l : L)
 			scanf("%d", &l);
 
-		L = remap(L);
-
-		for (int i = 0; i < 30; i++)
-			printf("%d\n", GetReverse(L));
+		printf("%d\n", GetReverse(L));
 	}
 
 	return 0;
