@@ -1,8 +1,9 @@
+// https://www.topcoder.com/community/data-science/data-science-tutorials/binary-search/
+// Lower bound and Upper bound
 /*
  * Robin Hood 구하는 알고리즘
  * 빼면 0 이하가 골치. 더하고 빼는 아이디어
  * 바이너리 serach 의 실제 적용 
- * (+1, -1 에 주의 특히 뺄때(안하면 뺄때 무한 루프))
  */
 #include <iostream>
 #include <fstream>
@@ -37,18 +38,20 @@ int main()
 	while (lo < hi)
 	{
 		int mid = (lo + hi) / 2;
-		if (mid == lo) // + 1 주의
+		// + 1 주의. lo = mid 하면 짤리는 현상
+		// 대비해서 무조건 + 1 or mid = lo + (hi-lo+1)/2
+		if (mid == lo) 
 			mid++;
 
 		// 그 중간값을 K로 했을 때 주어진 k 보다 
-		// 작은지 큰지에 따라 방향 결정
+		// 작은 구간을 택한다 (조건을 만족하는 최대 값 구하기)
 		ll sum = 0;
 		for (int i = 0; i < n; i++)
 			sum += max(mid - A[i], 0);
 		if (sum <= k)
 			lo = mid;
 		else
-			hi = mid - 1; // -1 주의
+			hi = mid - 1; // (크다면 mid 까지 포기)
 	}
 
 	ll t = k;
@@ -77,7 +80,7 @@ int main()
 		if (sum <= k)
 			hi = mid;
 		else
-			lo = mid + 1; // (안하면 무한루프)
+			lo = mid + 1; // (초건 만족하는 최소값 구하기)
 	}
 
 	t = k;
