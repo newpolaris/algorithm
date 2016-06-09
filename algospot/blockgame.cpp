@@ -6,18 +6,16 @@
 
 using namespace std;
 
-typedef bitset<25> BS;
-
 int N = 5;
 const int L = 6;
 
 char cache[1<<25];
-vector<char> Xpos[] = { {0, 0, 1}, {0, 1, 1}, {0, 1, 1}, {0, 0, 1}, {0, 0}, {0, 1} };
-vector<char> Ypos[] = { {0, 1, 1}, {0, 0,-1}, {0, 0, 1}, {0, 1, 0}, {0, 1}, {0, 0} };
+const vector<char> Xpos[] = { {0, 0, 1}, {0, 1, 1}, {0, 1, 1}, {0, 0, 1}, {0, 0}, {0, 1} };
+const vector<char> Ypos[] = { {0, 1, 1}, {0, 0,-1}, {0, 0, 1}, {0, 1, 0}, {0, 1}, {0, 0} };
 
-bool set(BS& bs, int x, int y, int k, bool bSet)
+bool set(int& bs, int x, int y, int k, bool bSet)
 {
-	vector<char> &xp = Xpos[k], &yp = Ypos[k];
+	const vector<char> &xp = Xpos[k], &yp = Ypos[k];
 
 	if (bSet)
 	{
@@ -27,7 +25,7 @@ bool set(BS& bs, int x, int y, int k, bool bSet)
 			if (xx >= N || xx < 0 || yy >= N || yy < 0)
 				return false;
 			int p = yy * N + xx;
-			if (bs[p] == 1) 
+			if (bs & (1 << p))
 				return false;
 		}
 	}
@@ -35,38 +33,27 @@ bool set(BS& bs, int x, int y, int k, bool bSet)
 	{
 		int xx = x + xp[i], yy = y + yp[i];	
 		int p = yy * N + xx;
-		bs[p] = bSet;
+		if (bSet)
+			bs |= (1 << p);
+		else
+			bs &= ~(1 << p);
 	}
 	return true;
 }
 
-bool set(BS& bs, int x, int y, int k)
+bool set(int& bs, int x, int y, int k)
 {
 	return set(bs, x, y, k, true);
 }
 
-void print(BS& bs)
-{
-	for (int y = 0; y < N; y++)
-	{
-		for (int x = 0; x < N; x++)
-		{
-			int pos = y * N + x;
-			cout << bs[pos];
-		}
-		cout << endl;
-	}
-	cout << endl;
-}
-
-void reset(BS& bs, int x, int y, int k)
+void reset(int& bs, int x, int y, int k)
 {
 	set(bs, x, y, k, false);
 }
 
-bool CanWin(BS& bs)
+bool CanWin(int& bs)
 {
-	char& ret = cache[bs.to_ulong()];
+	char& ret = cache[bs];
 	if (ret != -1) return ret;
 
 	ret = 0;
@@ -97,12 +84,17 @@ int main()
 	cin >> C;
 	while (C--)
 	{
-		BS bs;
+		int bs = 0;
 		string s;
 		for (int y = 0; y < N; y++) {
 			cin >> s;
-			for (int x = 0; x < N; x++) 
-				bs[y*N+x] = s[x] == '#';
+			for (int x = 0; x < N; x++) {
+				if (s[x] == '#')
+				{
+					int p = y*N+x;
+					bs |= (1 << p);
+				}
+			}
 		}
 		cout << (CanWin(bs) ? "WINNING" : "LOSING") << endl;
 	}
