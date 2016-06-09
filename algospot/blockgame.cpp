@@ -17,7 +17,7 @@ vector<char> Ypos[] = { {0, 1, 1}, {0, 0,-1}, {0, 0, 1}, {0, 1, 0}, {0, 1}, {0, 
 
 bool set(BS& bs, int x, int y, int k, bool bSet)
 {
-	vector<char>& xp = Xpos[k], yp = Ypos[k];
+	vector<char> &xp = Xpos[k], &yp = Ypos[k];
 
 	if (bSet)
 	{
