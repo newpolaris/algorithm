@@ -7,23 +7,6 @@ using namespace std;
 
 int N, Max, Min;
 
-vector<int> Cost;
-vector<int> Sati;
-int cache[401];
-
-int MaximumSati(int C)
-{
-	int& ret = cache[C];
-	if (ret != 0) return ret;
-
-	if (C < Min) return ret;
-
-	for (int i = 0; i < N; i++)
-		ret = max(ret, MaximumSati(C - Cost[i]) + Sati[i]);
-
-	return ret;
-}
-
 int main()
 {
 #ifdef _DEBUG
@@ -36,29 +19,26 @@ int main()
 	{
 		int M;
 		cin >> N >> M;
-		Cost = vector<int>(N);
-		Sati = vector<int>(N);
-		for (int i = 0; i < N; i++)
-			cin >> Cost[i] >> Sati[i];
-		for (auto& c : Cost) c /= 100;
 		M /= 100;
-		vector<double> Eff(N);
+		vector<int> Cost(N);
+		vector<int> pref(N);
 		for (int i = 0; i < N; i++)
-			Eff[i] = (double)Sati[i]/Cost[i];
-		int MaxI = distance(begin(Eff), max_element(begin(Eff), end(Eff)));
-		Max = min(Cost[MaxI]*2, M);
-		Min = *min_element(begin(Cost), end(Cost));
+			cin >> Cost[i] >> pref[i];
+		for (auto& c : Cost) c /= 100;
+		vector<int> cache(201);
 
-		int Change = Cost[MaxI]*2;
-		int RemainM = M - Change;
-		int BestSelect = RemainM/Cost[MaxI];
-		int MaxSati = BestSelect * Cost[MaxI];
+		int ret = 0;
+		cache[0] = 0;
+		for (int budget = 1; budget <= M; ++budget) {
+			int cand = 0;
+			for (int i = 0; i < N; i++)
+				if (budget >= Cost[i])
+					cand = max(cand, cache[(budget - Cost[i])%201] + pref[i]);
+			cache[budget % 201] = cand;
+			ret = max(ret, cand);
+		}
 
-		memset(cache, 0, sizeof(cache));
-		
-		MaxSati += MaximumSati(Change);
-
-		cout << MaxSati << endl;
+		cout << ret << endl;
 	}
 
 	return 0;
