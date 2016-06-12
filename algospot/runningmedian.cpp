@@ -26,20 +26,22 @@ int main()
 		priority_queue<int> Min, Max;
 		Min.push(-987654321);
 		Max = Min;
-		int num = 1;
+
 		auto insert = [&](int v) {
-			if (num & 1) Min.push(v);
-			else Max.push(-v);
-			if (num > 2) {
-				while (Min.top() > -Max.top()) {
-					int A = Min.top(), B = -Max.top();
-					Min.pop(); Min.push(B);
-					Max.pop(); Max.push(-A);
-				}
+			if (-Max.top() <= v) Max.push(-v);
+			else Min.push(v);
+			if (Max.size() >= Min.size() + 2) {
+				Min.push(-Max.top()); 
+				Max.pop();
 			}
-			num++;
+			else if (Min.size() >= Max.size() + 2) {
+				Max.push(-Min.top()); 
+				Min.pop();
+			}
 		};
-		auto median = [&]() { return Min.top(); };
+		auto median = [&]() { 
+			return Min.size() >= Max.size() ? Min.top() : -Max.top();
+		};
 		int sum = 0;
 		for (int i = 0; i < N; i++) {
 			insert(L[i]);
