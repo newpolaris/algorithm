@@ -1,10 +1,52 @@
 #include <iostream>
 #include <queue>
 #include <algorithm>
+#include <iomanip>
 
 using namespace std;
 
 typedef vector<double> vd;
+typedef vector<vd> vvd;
+
+class SquareMatrix
+{
+public:
+	SquareMatrix(int L) {
+		data = vvd(L, vd(L));
+	}
+
+	vd& operator[](int k) {
+		return data[k];
+	}
+
+	const vd& operator[](int k) const {
+		return data[k];
+	}
+
+	SquareMatrix pow(int k) const {
+		if (k == 2) return *this * *this;
+		if (k % 2 == 0) {
+			SquareMatrix half = pow(k/2);
+			return half * half;
+		}
+		return *this * pow(k - 1);
+	}
+
+	SquareMatrix operator*(const SquareMatrix& A) const {
+		int N = data.size();
+		SquareMatrix R(N);
+		for (int r = 0; r < N; r++) {
+		for (int c = 0; c < N; c++) {
+			double& v = R[r][c] ;
+			for (int k = 0; k < N; k++) {
+				v += data[r][k] * A[k][c];
+			}
+		}
+		}
+		return R;
+	}
+	vvd data;
+};
 
 int main()
 {
@@ -24,24 +66,26 @@ int main()
 		vector<double> Pref(M);
 		for (auto& p : Pref) cin >> p;
 
-		vector<vd> cache(5, vd(N));
-		cache[0][0] = 1.0;
-		for (int t = 1; t <= K; t++) {
-			for (int i = 0; i < N; i++) {
-				double& prob = cache[t % 5][i];
-				prob = 0.0;
-				for (int p = 0; p < N; p++) {
-					int prevT = (t - L[p] + 5)%5;
-					prob += cache[prevT][p] * T[p][i];
-				}
+		SquareMatrix matrix(4*N);
+		for (int i = 0; i < 3*N; i++)
+			matrix[i][i+N] = 1.0;
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				int t = (4 - L[j])*N + j;
+				matrix[3*N+i][t] = T[j][i];
 			}
 		}
+		auto Wk = matrix.pow(K);
 		vd ret(Pref.size());
 		for (int i = 0; i < Pref.size(); i++)
-			for (int t = K - L[Pref[i]] + 1; t <= K; t++) 
-				ret[i] += cache[t % 5][Pref[i]];
+			for (int l = 0; l < L[Pref[i]]; l++) {
+				int t = (3 - l)*N + Pref[i];
+				ret[i] += Wk[t][3*N];
+			}
+		cout << fixed << setprecision(8);
 		for (auto r : ret)
 			cout << r << " ";
 		cout << endl;
 	}
 }
+
