@@ -21,15 +21,11 @@ int main()
 		cache[0][0][0] = cache[0][1][0] = 1;
 		for (int n = 1; n < N; n++) {
 			int PP = (n - 1) % 2, NN = n % 2;
-			memset(cache[NN], 0, sizeof(cache[NN]));
 			for (int k = 0; k <= K; k++) {
 				for (int r = 0; r < N; r++) {
-					int& A = cache[NN][k][r];
-					A = (A + cache[PP][k][r]) % MOD;
-					if (k < K) {
-						int& B = cache[NN][k + 1][(r + n) % N];
-						B = (B + cache[PP][k][r]) % MOD;
-					}
+					int a = cache[PP][k][r];
+					int b = (k > 0) ? cache[PP][k-1][(r - n + N) % N] : 0;
+					cache[NN][k][r] = (a + b) % MOD;
 				}
 			}
 		}
