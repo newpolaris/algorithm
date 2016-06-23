@@ -6,7 +6,10 @@
 
 using namespace std;
 
-typedef pair<pair<double, double>, int> PDI;
+typedef pair<double, double> PD;
+
+const double pi = 2.0 * acos(0);
+const double EPS = 0.0000001;
 
 int main()
 {
@@ -19,75 +22,54 @@ int main()
 	while (C--) {
 		cin >> N;
 		double x, y, r;
-		vector<PDI> L;
+		vector<PD> L;
+		int minCount = 101;
 		for (int i = 0; i < N; i++)
 		{
 			cin >> x >> y >> r;
-
 			double S, E;
 			if (r >= 16.0)
-				S = 0.0, E = 2.0;
+				minCount = 1;
 			else
 			{
-				double A = atan2(y, x) / M_PI;
-				double th = acos(1.0 - r*r / (2*8*8)) / M_PI;
-				S = A - th;
-				if (S < 0.0) S += 2;
-				if (S > 2.0) S -= 2;
+				double A = atan2(y, x);
+				double th = acos(1.0 - r*r / (2*8*8));
+				S = fmod(2*pi + A - th, 2*pi);
 				E = S + 2.0*th;
 			}
-			L.push_back(make_pair(make_pair(S, -E), i));
-			if (E > 2.0) 
-				L.push_back(make_pair(make_pair(0.0, 2.0 - E), i));
+			L.push_back(make_pair(S, E));
 		}
-		// eliminate including
 		sort(L.begin(), L.end());
-		vector<PDI> K;
-		K.push_back(L[0]);
-		double s = L[0].first.first, e = -L[0].first.second;
-		double EPS = 0.0000001;
-		for (int i = 1; i < L.size(); i++)
-		{
-			double ns = L[i].first.first;
-			double ne = -L[i].first.second;
-			if (ne - e > EPS)
-			{
-				K.push_back(L[i]);
-				s = ns; e = ne;
+		for (int i = 0; i < L.size(); i++) {
+			auto& k = L[i];
+			if (k.second < 2*pi && k.first > 0.0)
+				continue;
+			int idx = -1;
+			int count = 1;
+			double s = fmod(k.second, 2*pi);
+			double e = fmod(k.first, 2*pi);
+			while (idx < (int)L.size()) {
+				if (s - e > EPS || abs(e - s) < EPS) {
+					minCount = min(minCount, count);
+					break;
+				}
+				double ne = -1.0;
+				int j = idx + 1;
+				while (j < L.size()) {
+					if (L[j].first - s > EPS) break;
+					ne = max(ne, L[j].second);
+					j++;
+				}
+				if (ne < 0) break;
+				s = ne;
+				count++;
+				idx = j - 1;
 			}
 		}
-		sort(K.begin(), K.end());
-		// range check
-		set<int> sol;
-		s = 0.0;
-		e = 0.0;
-		bool bComplete = false;
-		int idx = -1;
-		while (true) {
-			vector<int> T;
-			for (int i = idx + 1; i < K.size(); i++) {
-				double ns = K[i].first.first;
-				double ne = -K[i].first.second;
-				int nk = K[i].second;
-				if (ns - e > EPS) break;
-				T.push_back(i);
-			}
-			if (T.size() <= 0) 
-				break;
-			idx = T.back();
-			double ne = -K[idx].first.second;
-			int nk = K[idx].second;
-			sol.insert(nk);
-			e = ne;
-			if (e - 2.0 > EPS || 2.0 - e < EPS) {
-				bComplete = true;
-				break;
-			}
-		}
-		if (!bComplete)
+		if (minCount == 101)
 			cout << "IMPOSSIBLE" << endl;
 		else
-			cout << sol.size() << endl;
+			cout << minCount << endl;
 	}
 	return 0;
 }
