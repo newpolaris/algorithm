@@ -48,7 +48,7 @@ int main()
 			int count = 1;
 			double s = fmod(k.second, 2*pi);
 			double e = fmod(k.first, 2*pi);
-			while (idx < (int)L.size()) {
+			while (true) {
 				if (s - e > EPS || abs(e - s) < EPS) {
 					minCount = min(minCount, count);
 					break;
