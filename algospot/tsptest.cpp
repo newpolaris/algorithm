@@ -12,6 +12,8 @@ double dist[30][30];
 double best;
 double minEdge[IN_MAX];
 
+vector<int> nearest[MAX];
+
 double simpleHeuristic(vector<bool>& visited)
 {
 	double ret = minEdge[0];
@@ -29,7 +31,8 @@ void search(vector<int>& path, vector<bool>& visited, double currentLength) {
 		return;
 	}
 
-	for (int next = 0; next < n; ++next) {
+	for (int i = 0; i < nearest[here].size(); ++i) {
+		int next = nearest[here][i];
 		if (visited[next]) continue;
 		path.push_back(next);
 		visited[next] = true;
@@ -48,6 +51,16 @@ double solve() {
 		for (int j = 0; j < n; ++j)
 			if (i != j)
 				minEdge[i] = min(minEdge[i], dist[i][j]);
+	}
+	for (int i = 0; i < n; i++) {
+		vector<pair<double, int>> order;
+		for (int j = 0; j < n; ++j)
+			if (i != j)
+				order.push_back(make_pair(dist[i][j], j));
+		sort(order.begin(), order.end());
+		nearest[i].clear();
+		for (int j = 0; j < n-1; j++)
+			nearest[i].push_back(order[j].second);
 	}
 	best = INF;
 	vector<bool> visited(n, false);

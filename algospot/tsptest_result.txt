@@ -3,4 +3,4 @@ dp				0.0		0.04	1.5		43.0
 whole			1.2
 pruning			0.8		24.9
 heuristic		0.02	1.68	56.4
-
+close order		0.01	0.76	12.97
