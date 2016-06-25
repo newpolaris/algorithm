@@ -1,8 +1,6 @@
-dp (n:sec)
+(n:sec)			12		16		20		24	
+dp				0.0		0.04	1.5		43.0
+whole			1.2
+pruning			0.8		24.9
+heuristic		0.02	1.68	56.4
 
-(20:1.5 sec)
-(24:43.0 sec)
-
-whole (n:sec)
-(12:1.2 sec)
-(14:335 sec)

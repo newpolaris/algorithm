@@ -3,16 +3,26 @@
 #include <cmath>
 #include <algorithm>
 
+using namespace std;
+
 const double INF = 1e200;
-const int MAX = 13, IN_MAX = 30;
+const int MAX = 20, IN_MAX = 30;
 int n;
 double dist[30][30];
 double best;
+double minEdge[IN_MAX];
 
-using namespace std;
+double simpleHeuristic(vector<bool>& visited)
+{
+	double ret = minEdge[0];
+	for (int i = 0; i < n; i++)
+		if (!visited[i])
+			ret += minEdge[i];
+	return ret;
+}
 
 void search(vector<int>& path, vector<bool>& visited, double currentLength) {
-	if (best <= currentLength) return;
+	if (best <= currentLength + simpleHeuristic(visited)) return;
 	int here = path.back();
 	if (path.size() == n) {
 		best = min(best, currentLength + dist[here][0]);
@@ -32,6 +42,13 @@ void search(vector<int>& path, vector<bool>& visited, double currentLength) {
 }
 
 double solve() {
+	for (int i = 0; i< n; i++)
+	{
+		minEdge[i] = INF;
+		for (int j = 0; j < n; ++j)
+			if (i != j)
+				minEdge[i] = min(minEdge[i], dist[i][j]);
+	}
 	best = INF;
 	vector<bool> visited(n, false);
 	vector<int> path(1, 0);
