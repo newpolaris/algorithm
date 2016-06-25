@@ -1,0 +1,8 @@
+dp (n:sec)
+
+(20:1.5 sec)
+(24:43.0 sec)
+
+whole (n:sec)
+(12:1.2 sec)
+(14:335 sec)
