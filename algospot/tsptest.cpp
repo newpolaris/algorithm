@@ -6,7 +6,7 @@
 using namespace std;
 
 const double INF = 1e200;
-const int MAX = 20, IN_MAX = 30;
+const int MAX = 24, IN_MAX = 30;
 int n;
 double dist[30][30];
 double best;
@@ -23,8 +23,36 @@ double simpleHeuristic(vector<bool>& visited)
 	return ret;
 }
 
+bool pathSwapPruning(const vector<int>& path) {
+	if (path.size() < 4) return false;
+	int p = path[path.size() - 4];
+	int a = path[path.size() - 3];
+	int b = path[path.size() - 2];
+	int q = path[path.size() - 1];
+
+	return dist[p][a] + dist[b][q] > dist[p][b] + dist[a][q];
+}
+
+bool pathReversePruning(const vector<int>& path) {
+	if (path.size() < 4) return false;
+	int b = path[path.size() - 2];
+	int q = path[path.size() - 1];
+	for (int i = 0; i + 3 < path.size(); ++i) {
+		int p = path[i];
+		int a = path[i + 1];
+		if (dist[p][a] + dist[b][q] > dist[p][b] + dist[a][q])
+			return true;
+	}
+	return false;
+}
+
 void search(vector<int>& path, vector<bool>& visited, double currentLength) {
-	if (best <= currentLength + simpleHeuristic(visited)) return;
+	if (best <= currentLength + simpleHeuristic(visited)) 
+		return;
+
+	if (pathReversePruning(path))
+		return;
+
 	int here = path.back();
 	if (path.size() == n) {
 		best = min(best, currentLength + dist[here][0]);
