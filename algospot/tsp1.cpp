@@ -14,6 +14,64 @@ double best;
 double minEdge[IN_MAX];
 
 vector<int> nearest[MAX];
+// 모든 도시 간의 도로를 길이 순으로 정렬해 저장해 둔다.
+vector<pair<double,pair<int,int>>> edges;
+
+// 상호 배타적 집합 자료 구조를 구현한다.
+struct DisjointSet {
+	// n개의 원소로 구성된 집합 자료 구조를 만든다.
+	DisjointSet(int n);
+	// here가 포함된 집합의 대표를 반환한다.
+	int find(int here);
+	// a가 포함된 집합과 b가 포함된 집합을 합친다.
+	bool merge(int a, int b);
+
+	vector<int> P, Rank;
+};
+
+DisjointSet::DisjointSet(int n)
+{
+	P.resize(n);
+	for (int i = 0; i < n; i++)
+		P[i] = i;
+	Rank = vector<int>(n, 0);
+}
+
+int DisjointSet::find(int here)
+{
+	if (P[here] != here)
+		P[here] = find(P[here]);
+	return P[here];
+}
+
+bool DisjointSet::merge(int a, int b)
+{
+	int ra = find(a), rb = find(b);
+	if (ra == rb) return false;
+	if (Rank[ra] > Rank[rb])
+		P[rb] = ra;
+	else
+		P[ra] = rb;
+	if (Rank[ra] == Rank[rb]) 
+		Rank[rb] = Rank[ra] + 1;
+	return true;
+}
+
+
+// here와 시작점, 아직 방문하지 않은 도시들을 모두 연결하는 MST를 찾는다.
+double mstHeuristic(int here, const vector<bool>& visited) {
+	// Knuskal's mst	
+	DisjointSet sets(n);
+	double taken = 0;
+	for (int i = 0; i < edges.size(); ++i) {
+		int a = edges[i].second.first, b = edges[i].second.second;
+		if (a != here && visited[a]) continue;
+		if (b != here && visited[b]) continue;
+		if (sets.merge(a, b))
+			taken += edges[i].first;
+	}
+	return taken;
+}
 
 double simpleHeuristic(vector<bool>& visited)
 {
@@ -47,14 +105,14 @@ bool pathReversePruning(const vector<int>& path) {
 	return false;
 }
 
-void search(vector<int>& path, vector<bool>& visited, double currentLength) {
-	if (best <= currentLength + simpleHeuristic(visited)) 
-		return;
+void search(vector<int>& path, vector<bool>& visited, double currLen) {
 	if (pathReversePruning(path))
 		return;
 	int here = path.back();
+	if (best <= currLen + mstHeuristic(here, visited)) 
+		return;
 	if (path.size() == n) {
-		best = min(best, currentLength);
+		best = min(best, currLen);
 		return;
 	}
 
@@ -64,7 +122,7 @@ void search(vector<int>& path, vector<bool>& visited, double currentLength) {
 		path.push_back(next);
 		visited[next] = true;
 
-		search(path, visited, currentLength + dist[here][next]);
+		search(path, visited, currLen + dist[here][next]);
 
 		visited[next] = false;
 		path.pop_back();
@@ -89,6 +147,12 @@ double solve() {
 		for (int j = 0; j < n-1; j++)
 			nearest[i].push_back(order[j].second);
 	}
+	edges.clear();
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < i; ++j)
+			edges.push_back(make_pair(dist[i][j], make_pair(i, j)));
+	sort(edges.begin(), edges.end());
+
 	best = INF;
 	for (int i = 0; i < n; i++) {
 		vector<bool> visited(n, false);

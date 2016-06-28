@@ -1,3 +1,4 @@
+#include "DisjointSet.hpp"
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -13,6 +14,7 @@ double best;
 double minEdge[IN_MAX];
 
 vector<int> nearest[MAX];
+vector<pair<double, pair<int,int>>> edges;
 
 double simpleHeuristic(vector<bool>& visited)
 {
@@ -21,6 +23,22 @@ double simpleHeuristic(vector<bool>& visited)
 		if (!visited[i])
 			ret += minEdge[i];
 	return ret;
+}
+
+// here와 시작점, 아직 방문하지 않은 도시들을 모두 연결하는 MST를 찾는다.
+double mstHeuristic(int here, const vector<bool>& visited) {
+	// Knuskal's mst	
+	DisjointSet set(n);
+	double taken = 0;
+	for (int i = 0; i < edges.size(); i++)
+	{
+		int a = edges[i].second.first, b = edges[i].second.second;
+		if (a != 0 && a != here && visited[a]) continue;
+		if (b != 0 && b != here && visited[b]) continue;
+		if (set.merge(a, b))
+			taken += edges[i].first;
+	}
+	return taken;
 }
 
 bool pathSwapPruning(const vector<int>& path) {
@@ -47,13 +65,13 @@ bool pathReversePruning(const vector<int>& path) {
 }
 
 void search(vector<int>& path, vector<bool>& visited, double currentLength) {
-	if (best <= currentLength + simpleHeuristic(visited)) 
+	int here = path.back();
+	if (best <= currentLength + mstHeuristic(here, visited)) 
 		return;
 
 	if (pathReversePruning(path))
 		return;
 
-	int here = path.back();
 	if (path.size() == n) {
 		best = min(best, currentLength + dist[here][0]);
 		return;
@@ -90,6 +108,11 @@ double solve() {
 		for (int j = 0; j < n-1; j++)
 			nearest[i].push_back(order[j].second);
 	}
+	edges.clear();
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < i; j++)
+			edges.push_back(make_pair(dist[i][j], make_pair(i,j)));
+	sort(edges.begin(), edges.end());
 	best = INF;
 	vector<bool> visited(n, false);
 	vector<int> path(1, 0);
