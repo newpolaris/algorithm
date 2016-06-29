@@ -57,27 +57,26 @@ bool DisjointSet::merge(int a, int b)
 	return true;
 }
 
-
 // here와 시작점, 아직 방문하지 않은 도시들을 모두 연결하는 MST를 찾는다.
-double mstHeuristic(int here, const vector<bool>& visited) {
+double mstHeuristic(int here, int visited) {
 	// Knuskal's mst	
 	DisjointSet sets(n);
 	double taken = 0;
 	for (int i = 0; i < edges.size(); ++i) {
 		int a = edges[i].second.first, b = edges[i].second.second;
-		if (a != here && visited[a]) continue;
-		if (b != here && visited[b]) continue;
+		if (a != here && (visited & 1<<a)) continue;
+		if (b != here && (visited & 1<<b)) continue;
 		if (sets.merge(a, b))
 			taken += edges[i].first;
 	}
 	return taken;
 }
 
-double simpleHeuristic(vector<bool>& visited)
+double simpleHeuristic(int visited)
 {
 	double ret = 0;
 	for (int i = 0; i < n; i++)
-		if (!visited[i])
+		if (!(visited & (1<<i)))
 			ret += minEdge[i];
 	return ret;
 }
@@ -105,7 +104,7 @@ bool pathReversePruning(const vector<int>& path) {
 	return false;
 }
 
-void search(vector<int>& path, vector<bool>& visited, double currLen) {
+void search(vector<int>& path, int visited, double currLen) {
 	if (pathReversePruning(path))
 		return;
 	int here = path.back();
@@ -118,13 +117,9 @@ void search(vector<int>& path, vector<bool>& visited, double currLen) {
 
 	for (int i = 0; i < nearest[here].size(); ++i) {
 		int next = nearest[here][i];
-		if (visited[next]) continue;
+		if (visited & (1<<next)) continue;
 		path.push_back(next);
-		visited[next] = true;
-
-		search(path, visited, currLen + dist[here][next]);
-
-		visited[next] = false;
+		search(path, visited + (1<<next), currLen + dist[here][next]);
 		path.pop_back();
 	}
 }
@@ -155,10 +150,8 @@ double solve() {
 
 	best = INF;
 	for (int i = 0; i < n; i++) {
-		vector<bool> visited(n, false);
 		vector<int> path(1, i);
-		visited[i] = true;
-		search(path, visited, 0);
+		search(path, 1<<i, 0);
 	}
 	return best;
 }
