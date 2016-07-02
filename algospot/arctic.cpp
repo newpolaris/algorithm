@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 using namespace std;
 
@@ -10,15 +10,15 @@ float xs[100], ys[100];
 
 float prim(int N)
 {
-	vector<float> distance(N, numeric_limits<float>::infinity());
+	vector<float> distance(N, 1e200);
 	vector<bool> checked(N, false);
 
-	distance[0] = 0; 
+	distance[0] = 0.f; 
 
 	int n = N;
 	while (n--)
 	{
-		float minDist = numeric_limits<float>::infinity();
+		float minDist = 1e200;
 
 		int vnear = -1; // next cadidate vertex
 		for (int i = 0; i < N; i++)
@@ -63,8 +63,7 @@ int main()
 			W[i][i] = 0;
 			for (int j = i + 1; j < N; j++)
 			{
-				double dx = xs[j] - xs[i];
-				double dy = ys[j] - ys[i];
+				float dx = xs[j] - xs[i], dy = ys[j] - ys[i];
 				W[j][i] = W[i][j] = dx*dx + dy*dy;
 			}
 		}
