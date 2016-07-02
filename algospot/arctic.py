@@ -1,6 +1,8 @@
 from itertools import combinations
 import sys
 
+# warn : 296 ms in pypy
+
 sys.stdin = open("arctic.in")
 
 for C in xrange(input()):
