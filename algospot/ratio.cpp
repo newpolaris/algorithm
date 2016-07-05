@@ -23,10 +23,13 @@ int main()
 		while (low < high)
 		{
 			mid = (low + high)/2;
-			if (p(mid) == true) high = mid;
-			else low = mid + 1;
+			if (p(mid) == true) 
+				high = mid;
+			else 
+				low = mid + 1;
 		}
-		if (p(low) == false) low = -1;
+		if (p(low) == false) 
+			low = -1;
 		cout << low << endl;
 	}
 
