@@ -11,8 +11,6 @@ typedef vector<vi> vvi;
 
 int N, K, M, L, INF = 987654321;
 int cache[1<<12][11];
-int classes[11];
-int prerequisite[12];
 vvi Require, Semester;
 
 int bitcount(int n)
@@ -50,31 +48,41 @@ int graduate(int taken, int semester)
 	if (ret > 0) return ret;
 	ret = INF;
 
-	int canTake = (classes[semester] & ~taken);
-	for (int i = 0; i < N; i++)
-		if ((canTake & (1 << i)) && 
-				(taken &  prerequisite[i]) != prerequisite[i])
-			canTake &= ~(1 << i);
-	for (int take = canTake; take > 0; take = ((take - 1) & canTake)) {
-		if (bitcount(take) > L) continue;
-		ret = min(ret, graduate(taken | take, semester + 1) + 1);
+	vi can;
+	auto& S = Semester[semester];
+	for (auto& s : S)
+	{
+		const auto& R = Require[s];
+		auto bRegister = all_of(begin(R), end(R), 
+				[&](int k) { return taken & (1 << k); });
+		if (bRegister)
+			can.push_back(s);
 	}
+
+	int n = can.size();
+	int r = min(n, L);
+	vi v(r);
+	iota(begin(v), end(v), 1);
+	do {
+		int take = 0;
+		for (auto& a : v)
+			take |= (1 << can[a-1]);
+		ret = min(ret, graduate(taken|take, semester + 1) + 1);
+	}
+	while (nextComb(v, n, r));
 	ret = min(ret, graduate(taken, semester + 1));
 	return ret;
 }
 
-void read(int* t, int k)
+void read(vvi& v, int k)
 {
-	for (int i = 0; i < k; i++)
+	v = vvi(k);
+	for (auto& i : v)
 	{
-		int a, b, c = 0;
-		cin >> a;
-		for (int j = 0; j < a; j++)
-		{
-			cin >> b;
-			c |= (1 << b);
-		}
-		t[i] = c;
+		cin >> k;
+		i.resize(k);
+		for (auto& t : i)
+			cin >> t;
 	}
 }
 
@@ -90,12 +98,10 @@ int main()
 	{
 		cin >> N >> K >> M >> L;	
 
-		memset(cache, -1, sizeof(cache));
-		memset(classes, 0, sizeof(classes));
-		memset(prerequisite, 0, sizeof(prerequisite));
+		read(Require, N);
+		read(Semester, M);
 
-		read(prerequisite, N);
-		read(classes, M);
+		memset(cache, -1, sizeof(cache));
 
 		int k = graduate(0, 0);
 		if (k <= K)
@@ -106,4 +112,3 @@ int main()
 
 	return 0;
 }
-
