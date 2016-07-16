@@ -26,18 +26,6 @@ int main()
 		for (auto& l : L)
 			in >> l;
 
-		int maxsum = 0;
-
-		auto is = L.begin();
-		while (is != L.end())
-		{
-			auto ie = find_if(is, L.end(), [](int k) { return k < 0; });
-			maxsum = max(maxsum, accumulate(is, ie, 0));
-			is = ie;
-			if (is != L.end())
-				is++;
-		}
-		cout << maxsum << endl;
 	}
 
 	return 0;
