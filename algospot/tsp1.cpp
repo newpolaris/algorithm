@@ -3,6 +3,7 @@
 #include <cmath>
 #include <algorithm>
 #include <iomanip>
+#include <map>
 
 using namespace std;
 
@@ -12,10 +13,12 @@ int n;
 double dist[IN_MAX][IN_MAX];
 double best;
 double minEdge[IN_MAX];
+const int CACHED_DEPTH = 5;
 
 vector<int> nearest[MAX];
 // 모든 도시 간의 도로를 길이 순으로 정렬해 저장해 둔다.
 vector<pair<double,pair<int,int>>> edges;
+map<int, double> cache[MAX][CACHED_DEPTH+1];
 
 // 상호 배타적 집합 자료 구조를 구현한다.
 struct DisjointSet {
@@ -62,6 +65,7 @@ double mstHeuristic(int here, int visited) {
 	// Knuskal's mst	
 	DisjointSet sets(n);
 	double taken = 0;
+	// sort 된 edges
 	for (int i = 0; i < edges.size(); ++i) {
 		int a = edges[i].second.first, b = edges[i].second.second;
 		if (a != here && (visited & 1<<a)) continue;
@@ -104,12 +108,31 @@ bool pathReversePruning(const vector<int>& path) {
 	return false;
 }
 
+double dp(int here, int visited) 
+{
+	if (visited == (1<<n) - 1) return 0;
+	int remaining = n - __builtin_popcount(visited);
+	double& ret = cache[here][remaining][visited];
+	if (ret > 0) return ret;
+	ret = INF;
+	for (int next = 0; next < n; ++next)
+	{
+		if (visited & (1 << next)) continue;
+		ret = min(ret, dp(next, visited + (1<<next)) + dist[here][next]);
+	}
+	return ret;
+}
+
 void search(vector<int>& path, int visited, double currLen) {
 	if (pathReversePruning(path))
 		return;
 	int here = path.back();
 	if (best <= currLen + mstHeuristic(here, visited)) 
 		return;
+	if (path.size() + CACHED_DEPTH >= n) {
+		best = min(best, currLen + dp(here, visited));
+		return;
+	}
 	if (path.size() == n) {
 		best = min(best, currLen);
 		return;
@@ -147,6 +170,10 @@ double solve() {
 		for (int j = 0; j < i; ++j)
 			edges.push_back(make_pair(dist[i][j], make_pair(i, j)));
 	sort(edges.begin(), edges.end());
+
+	for (int i = 0; i < MAX; ++i)
+		for (int j = 0; j <= CACHED_DEPTH; ++j)
+			cache[i][j].clear();
 
 	best = INF;
 	for (int i = 0; i < n; i++) {

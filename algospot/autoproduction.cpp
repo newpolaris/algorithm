@@ -1,7 +1,12 @@
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
+
+int need[10];
+int bagNum[10];
+int bag[10][10];
 
 int main()
 {
@@ -9,24 +14,50 @@ int main()
 	freopen("autoproduction.in","r",stdin);
 #endif
 
-	int T, N, R, C;
+	int T, N, R;
 
 	cin >> T;
 	while (T--)
 	{
 		cin >> N;
-		int PRO = 1001;
-		for (int i = 0; i < N; i++)
+
+		for (int n = 0; n < N; n++)
 		{
-			cin >> R >> C;
-			int sum = 0, k;
-			for (int i = 0; i < C; i++) {
-				cin >> k;
-				sum += k;
-			}
-			PRO = min(PRO, sum / R);
+			cin >> need[n] >> bagNum[n];
+			for (int i = 0; i < bagNum[n]; i++)
+				cin >> bag[n][i];
+			sort(bag[n], bag[n]+bagNum[n], greater<int>());
 		}
-		cout << PRO << endl;
+
+		auto fit = [&](int m) {
+			int boxLimit = 10;
+			for (int i = 0; i < N; i++)
+			{
+				int sum = 0;
+				int require = m*need[i];
+				for (int t = 0; t < bagNum[i]; t++) {
+					if (require <= sum) 
+						break; 
+					sum += bag[i][t];
+					boxLimit--;
+					if (boxLimit < 0) 
+						return false;
+				}
+				if (require > sum) 
+					return false;
+			}
+			return true;
+		};
+		int lo = 0, hi = 10000;
+		while (lo < hi)
+		{
+			int mid = lo + (hi - lo + 1) / 2;
+			if (!fit(mid))
+				hi = mid - 1;
+			else
+				lo = mid;
+		}
+		cout << lo << endl;
 	}
 	return 0;
 }

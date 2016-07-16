@@ -17,7 +17,7 @@ vector<int> convert(const string& A)
 
 vector<int> multi(const vector<int>& a, const vector<int>& b)
 {
-	vector<int> C(a.size()+b.size()+1);
+	vector<int> C(a.size()+b.size());
 
 	for (int i = 0; i < b.size(); i++)
 	{
@@ -30,7 +30,7 @@ vector<int> multi(const vector<int>& a, const vector<int>& b)
 
 vector<int> add(const vector<int>& a, const vector<int>& b, int shift = 0)
 {
-	vector<int> c(max(a.size(), b.size()+shift)+1);
+	vector<int> c(max(a.size(), b.size()+shift));
 	
 	for (int i = 0; i < a.size(); i++)
 		c[i] = a[i];
@@ -43,7 +43,7 @@ vector<int> add(const vector<int>& a, const vector<int>& b, int shift = 0)
 
 vector<int> sub(const vector<int>& a, const vector<int>& b)
 {
-	vector<int> c(max(a.size(), b.size())+1);
+	vector<int> c(max(a.size(), b.size()));
 
 	for (int i = 0; i < a.size(); i++)
 		c[i] = a[i];
@@ -62,7 +62,7 @@ vector<int> karatsuba(const vector<int>& a, const vector<int>& b)
 	if (a.size() < b.size()) 
 		return karatsuba(b, a);
 
-	if (a.size() <= 2)
+	if (a.size() <= 150)
 		return multi(a, b);
 
 	auto half = a.size() / 2;
@@ -115,7 +115,6 @@ int main()
 {
 #if _DEBUG
 	ifstream fin("fanmeeting.in");
-	// ifstream fin("fanmeeting-large.in");
 	istream& in = fin;
 #else
 	istream& in = cin;

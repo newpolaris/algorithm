@@ -6,9 +6,9 @@
 using namespace std;
 
 const double INF = 1e200;
-const int MAX = 12;
+const int MAX = 16, IN_MAX = 30;
 int n;
-double dist[MAX][MAX];
+double dist[30][30];
 double cache[MAX][1<<MAX];
 
 double shortestPath(int here, int visited)
