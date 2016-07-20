@@ -1,42 +1,45 @@
 #include <iostream>
-#include <vector>
-#include <stack>
 #include <string>
+#include <algorithm>
+#include <string.h>
 
 using namespace std;
 
 string str;
 const string opening = "([", closing = ")]";
-int cache[101];
+int cache[101][101];
 
-int matching(stack<char>& s, int i)
+// 닫는 괄호는 무시하고, 열린기호에서 모든 닫는 기호에 대해 처리한다.
+// 핵심은 cache를 2중으로 from, to 로 두는 것
+int match(int from, int to)
 {
-	if (i >= str.size()) return 0;
+	if (from >= to) return 0;
+	if (cache[from][to] >= 0) return cache[from][to];
 
-	// discard case : do nothing
-	int ret = cache[i];
-	if (ret >= 0) return ret;
-	ret = max(ret, matching(s, i+1));
-
-	auto it = opening.find(str[i]);
-
-	// opening
-	if (it != string::npos)
+	int& ret = cache[from][to];
+	ret = 0;
+	auto io = opening.find(str[from]);
+	if (io != string::npos)
 	{
-		s.push(str[i]);
-		ret = max(ret, matching(s, i+1));
-		s.pop();
-	}
-	else if (s.size() > 0) // closing
-	{
-		char c = s.top();
-		if (closing.find(str[i]) == opening.find(c))
+		int start = from+1;
+		while (true)
 		{
-			s.pop();
-			ret = max(ret, matching(s, i+1)+2);
-			s.push(c);
+			int lc = -1;
+			for (int i = start; i <= to; i++) 
+			{
+				if (str[i] == closing[io]) 
+				{
+					lc = i; break;
+				}
+			}
+			if (lc == -1) break;
+			ret = max(ret, match(from+1, lc-1) + 2 + match(lc+1, to));
+			start = lc + 1;
 		}
 	}
+	// opening skip case & closing
+	ret = max(ret, match(from+1, to));
+
 	return ret;
 }
 
@@ -50,8 +53,7 @@ int main()
 	while (str != "end")
 	{
 		memset(cache, -1, sizeof(cache));
-		stack<char> s;
-		cout << matching(s, 0) << endl;
+		cout << match(0, str.size()) << endl;
 		cin >> str;
 	}
 
