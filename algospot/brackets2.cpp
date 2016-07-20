@@ -1,19 +1,18 @@
 #include <iostream>
 #include <stack>
 #include <string>
+#include <map>
 
 using namespace std;
 
-char close[256];
+map<char, char> close = {{']','['}, {')','('}, {'}','{'}};
 
 bool check(string str)
 {
-	auto isopen = [](char c) { return c == '[' || c == '(' || c == '{'; };
-
 	stack<char> s;
 	for (char c : str)
 	{
-		if (isopen(c))
+		if (close.find(c) == close.end())
 			s.push(c);
 		else
 		{
@@ -31,10 +30,6 @@ int main()
 #if _DEBUG
 	freopen("brackets2.in", "r", stdin);
 #endif
-	close[')'] = '(';
-	close['}'] = '{';
-	close[']'] = '[';
-
 	int C;
 	cin >> C;
 	while (C--)
