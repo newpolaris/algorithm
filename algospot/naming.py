@@ -1,18 +1,17 @@
 # Kmp failure function 
 a = raw_input()
 b = raw_input()
-a += b
-m, n = 0, len(a)
+pattern = a + b
+matched, n = 0, len(pattern)
 pi = [0]*n
 for i in range(1, n):
-    while m > 0 and a[i] != a[m]:
-        m = pi[m-1]
-    if a[i] == a[m]:
-        m += 1
-    pi[i] = m 
+    while matched > 0 and pattern[i] != pattern[matched]:
+        matched = pi[matched-1]
+    if pattern[i] == pattern[matched]:
+        matched += 1
+    pi[i] = matched 
 l = []
-k = n
-while k > 0:
-    l.append(k)
-    k = pi[k - 1]
+while n > 0:
+    l.append(n)
+    n = pi[n - 1]
 print(" ".join([str(i) for i in reversed(l)]))
