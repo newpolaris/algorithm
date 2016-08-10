@@ -34,31 +34,22 @@ int main()
 		cin >> a;
 
 		string ra(a.rbegin(), a.rend());
-
 		auto pi = getPartialMatch(ra);
 
-		int matched = 0, begin = 0;
 		int n = a.size();
-		while (begin < n)
+		int matched = 0, i;
+		for (int i = 0; i < n; i++)
 		{
-			if (matched < n && a[begin + matched] == ra[matched])
-			{
+			while (matched > 0 && a[i] != ra[matched])
+				matched = pi[matched-1];
+			if (a[i] == ra[matched]) {
 				matched++;
-				if (begin + matched == n)
+				// 진행이 끝까지 된 것을 반환한다.
+				if (i - 1 == n)
 					break;
 			}
-			else
-			{
-				if (matched == 0)
-					begin++;
-				else
-				{
-					begin += matched - pi[matched-1];
-					matched = pi[matched-1];
-				}
-			}
 		}
-		cout << n + begin << endl;
+		cout << n*2 - matched << endl;
 	}
 
 	return 0;
