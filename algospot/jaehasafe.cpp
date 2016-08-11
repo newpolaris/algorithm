@@ -4,7 +4,7 @@
 
 using namespace std;
 
-vector<int> getPartialMatch(string& a)
+vector<int> getPartialMatch(const string& a)
 {
 	int n = a.size();
 	vector<int> pi(n, 0);
@@ -20,6 +20,31 @@ vector<int> getPartialMatch(string& a)
 	return pi;
 }
 
+// N : pattern
+int kmpSearchFirst(const string& H, const string& N)
+{
+	auto pi = getPartialMatch(N);
+
+	int z = H.size(), l = N.size();
+	int matched = 0;
+	for (int i = 0; i < z; i++)
+	{
+		while (matched > 0 && H[i] != N[matched])
+			matched = pi[matched-1];
+		if (H[i] == N[matched]) {
+			matched++;
+			// 가장 가까운 것을 반환
+			if (matched == l)
+				return i - l + 1;
+		}
+	}
+	return -1;
+}
+
+int shifts(const string& original, const string& target) {
+	return kmpSearchFirst(original + original, target);
+}
+
 int main()
 {
 #ifdef _DEBUG
@@ -30,41 +55,19 @@ int main()
 	cin >> c;
 	while (c--)
 	{
-		string a;
-
 		cin >> n;
-		cin >> a;
-		vector<string> str(n);
+		vector<string> str(n+1);
 		for (auto& k : str)
 			cin >> k;
 
-		auto pi = getPartialMatch(a);
+		int count = 0;
+		for (int i = 0; i < n; i++) {
+			if (i % 2)
+				count += shifts(str[i], str[i+1]);
+			else 
+				count += shifts(str[i+1], str[i]);
+		}
 
-		int z = a.size();
-		vector<int> idx;
-		for (int l = 0; l < str.size(); l++)
-		{
-			string& s = str[l];
-			int matched = 0;
-			for (int i = 0; i < 2*z; i++)
-			{
-				while (matched > 0 && a[matched] != s[i%z])
-					matched = pi[matched-1];
-				if (a[matched] == s[i%z]) {
-					matched++;
-					// 진행이 끝까지 된 것을 반환한다.
-					if (matched == z) {
-						idx.push_back((i - z + 1)%z);
-						break;
-					}
-				}
-			}
-		}
-		int count = idx[0];
-		for (int i = 1; i < idx.size(); i++) {
-			auto t = idx[i] - idx[i-1];
-			count += (((i % 2) ? -t : t) + z) % z;
-		}
 		cout << count << endl;
 	}
 
