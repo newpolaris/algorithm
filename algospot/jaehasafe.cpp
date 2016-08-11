@@ -54,7 +54,7 @@ int main()
 					matched++;
 					// 진행이 끝까지 된 것을 반환한다.
 					if (matched == z) {
-						idx.push_back(i - z + 1);
+						idx.push_back((i - z + 1)%z);
 						break;
 					}
 				}
@@ -63,8 +63,7 @@ int main()
 		int count = idx[0];
 		for (int i = 1; i < idx.size(); i++) {
 			auto t = idx[i] - idx[i-1];
-			if (i % 2) t = -t;
-			count += (t + z) % z;
+			count += (((i % 2) ? -t : t) + z) % z;
 		}
 		cout << count << endl;
 	}
