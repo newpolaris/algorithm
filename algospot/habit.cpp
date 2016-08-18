@@ -9,22 +9,6 @@
 
 using namespace std;
 
-struct Comparator
-{
-	const vector<int>& group;
-	int t;
-
-	Comparator(const vector<int>& _group, int _t)
-		: group(_group), t(_t) {}
-
-	bool operator () (int a, int b) const
-	{
-		if (group[a] != group[b]) 
-			return group[a] < group[b];
-		return group[a+t] < group[b+t];
-	}
-};
-
 // s의 접미사 배열을 계산한다.
 vector<int> getSuffixArray(const string& s) {
 	int n = s.size();
@@ -40,7 +24,13 @@ vector<int> getSuffixArray(const string& s) {
 
 	while (t < n)
 	{
-		Comparator compareUsing2T(group, t);
+		auto compareUsing2T = [t, &group](int a, int b) {
+			// 첫 t 글자가 다르면 이들을 이용해 비교한다
+			if (group[a] != group[b])
+				return group[a] < group[b];
+			// 아니라면 s[a+t:]와 s[b+t:]의 첫 t글자를 비교한다
+			return group[a+t] < group[b+t];
+		};
 		sort(perm.begin(), perm.end(), compareUsing2T);
 
 		t *= 2;
@@ -69,20 +59,6 @@ int commonPrefix(const string& s, int a, int b) {
 	return i;
 }
 
-// s의 서로 다른 부분 문자열의 수를 센다.
-int countSubstrings(const string& s) {
-	vector<int> a = getSuffixArray(s);
-	int ret = 0;
-	int n = s.size();
-	for (int i = 0; i < a.size(); ++i) {
-		int cp = 0;
-		if (i > 0) cp = commonPrefix(s, a[i-1], a[i]);
-		// a[i]의 (n-a[i]) 개의 접두사들 중에서 cp개는 중복이다.
-		ret += s.size() - a[i] - cp;
-	}
-	return ret;
-}
-
 // k번 이상 출현하는 s의 부분 문자열 중 최대 길이를 찾는다.
 int longestFrequent(int k, const string& s) {
 	vector<int> a = getSuffixArray(s);
@@ -97,11 +73,6 @@ int main()
 #ifdef _DEBUG
 	freopen("habit.in", "r", stdin);
 #endif
-//    string s("alohomora");
-//    auto r = getSuffixArray(s);
-
-//    copy(begin(r), end(r), ostream_iterator<int>(cout, ", "));
-	
 	int c, k;
 	string s;
 
