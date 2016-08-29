@@ -61,7 +61,7 @@ int main()
 		xy += m[i][n-i-1];
 	list.push_back(xy);
 
-	bool bScc = all_of(list.begin(), list.end(), [&](int i){ return list.front() == i; });
+	bool bScc = all_of(list.begin(), list.end(), [&](ll i){ return list.front() == i; });
 	if (newnum <= 0)
 		bScc = false;
 	cout << ( bScc ? newnum : -1 ) << endl;
