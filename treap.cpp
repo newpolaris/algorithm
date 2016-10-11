@@ -8,8 +8,11 @@
 
 using namespace std;
 
-/* note : rand is fast enough
- * just 2x fast : http://stackoverflow.com/a/3747462
+/*
+ * note : rand is fast enough
+ * speed up 
+ * 	comment - just 2x fast http://stackoverflow.com/a/3747462
+ *
  inline int fastrand() { 
 	 g_seed = (214013*g_seed+2531011); 
 	 return (g_seed>>16)&0x7FFF; 
@@ -88,13 +91,15 @@ Node* insert(Node* root, Node* node) {
 	return root;
 }
 
-// a 와 b가 두개의 트립이고, max(a) < min(b) 일 떄 이 둘을 합친다.
+// a 와 b가 두개의 트립이고, key 값이 max(a) < min(b) 일 떄 이 둘을 합친다.
 Node* merge(Node* a, Node* b) {
 	if (!a) return b;
 	if (!b) return a;
+	// left rotate
 	if (a->priority < b->priority) {
 		b->setLeft(merge(a, b->left));
 		return b;
+	// right rotate
 	} else {
 		a->setRight(merge(a->right, b));
 		return a;
@@ -143,8 +148,6 @@ std::ostream& operator<<(std::ostream& strm, const Node& node) {
 
 int main()
 {
-	int C;
-	
 	Node* root = nullptr;
 	root = insert(root, new Node(10));
 	root = insert(root, new Node(15));
