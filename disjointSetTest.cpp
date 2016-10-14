@@ -1,4 +1,4 @@
-#include "DisjointSet.hpp"
+#include "disjointSet.hpp"
 #include <iostream>
 #include <assert.h>
 #include <cstdlib>
