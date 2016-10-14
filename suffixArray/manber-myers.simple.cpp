@@ -93,7 +93,7 @@ int longestFrequent(int k, const string& s) {
 }
 
 /* 
- * lcp find in O(n)
+ * LCP(Longest Common Prefix) find in O(n)
  *
  * http://codeforces.com/blog/entry/12796?#comment-175287
  * Kasai's algorithm is pretty easy and works in O(n).
