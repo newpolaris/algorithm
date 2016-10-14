@@ -32,7 +32,7 @@ vector<int> getSuffixArray(const string& s) {
 		// 각 접미사들의 첫 t 글자를 기준으로 한 그룹 번호가 주어질 때,
 		// 주어진 두 접미사를 첫 2*t 글자를 기준으로 비교한다.
 		// group[]은 길이가 0인 접미사도 포함한다.
-		auto compareUsing2T = [&](int a, int b) {
+		auto compareUsing2T = [t, &group](int a, int b) {
 			// 첫 t 글자가 다르면 이들을 이용해 비교한다
 			if (group[a] != group[b])
 				return group[a] < group[b];
@@ -56,6 +56,7 @@ vector<int> getSuffixArray(const string& s) {
 			newGroup[perm[i]] = newGroup[perm[i-1]] + nextGroup;
 		}
 		group = newGroup;
+
 	}
 	return perm;
 }
@@ -91,9 +92,108 @@ int longestFrequent(int k, const string& s) {
 	return ret;
 }
 
+/* 
+ * lcp find in O(n)
+ *
+ * http://codeforces.com/blog/entry/12796?#comment-175287
+ * Kasai's algorithm is pretty easy and works in O(n).
+ * Let's look at the two continuous suffixes in the suffix array. Let their indexes in 
+ * suffix array be i1 and i1 + 1. If their lcp > 0, then if we delete first letter from
+ * both of them. We can easily see that new strings will have the same relative order.
+ * Also we can see that lcp of new strings will be exactly lcp - 1.
+ * Let's now look at the string wich we have got from the i suffix by deleting its first character.
+ * Obviously it is some suffix of the string too. Let its index be i2.
+ * Let's look at the lcp of suffixes i2 and i2 + 1. We can see that it's lcp will be at
+ * least already mentioned lcp - 1. This is associated with certain properties of lcp 
+ * array, in particular, that lcp(i, j) = min(lcpi, lcpi + 1, ..., lcpj - 1).
+ * And finally let's make the algorithm based on the mentioned above. 
+ * We will need an additional array rank[n], wich will contain the index 
+ * in the suffix array of the suffix starting in index i. 
+ * Firstly we should calculate the lcp of the suffix with index rank[0].
+ * Then let's iterate through all suffixes in order in which we meet them in the string 
+ * and calculate lcp[rank[i]] in naive way, BUT starting it from lcp[rank[i - 1]] - 1.
+ * Easy to see that now we have O(n) algorithm because on the each step our lcp decreasing 
+ * not more than by 1 (except the case when rank[i] = n - 1).
+ * Implementation:
+ */
+vector<int> kasai(string s, vector<int> sa)
+{
+    int n=s.size(),k=0;
+    vector<int> lcp(n,0);
+    vector<int> rank(n,0);
+
+    for(int i=0; i<n; i++) rank[sa[i]]=i;
+
+    for(int i=0; i<n; i++, k?k--:0)
+    {
+        if(rank[i]==n-1) {k=0; continue;}
+        int j=sa[rank[i]+1];
+        while(i+k<n && j+k<n && s[i+k]==s[j+k]) k++;
+        lcp[rank[i]]=k;
+    }
+    return lcp;
+}
+
+/*
+ * http://www.geeksforgeeks.org/%C2%AD%C2%ADkasais-algorithm-for-construction-of-lcp-array-from-suffix-array/
+ */
+vector<int> kasai2(string txt, vector<int> suffixArr)
+{
+    int n = suffixArr.size();
+ 
+    // To store LCP array
+    vector<int> lcp(n, 0);
+ 
+    // An auxiliary array to store inverse of suffix array
+    // elements. For example if suffixArr[0] is 5, the
+    // invSuff[5] would store 0.  This is used to get next
+    // suffix string from suffix array.
+    vector<int> invSuff(n, 0);
+ 
+    // Fill values in invSuff[]
+    for (int i=0; i < n; i++)
+        invSuff[suffixArr[i]] = i;
+ 
+    // Initialize length of previous LCP
+    int k = 0;
+ 
+    // Process all suffixes one by one starting from
+    // first suffix in txt[]
+    for (int i=0; i<n; i++)
+    {
+        /* If the current suffix is at n-1, then we don’t
+           have next substring to consider. So lcp is not
+           defined for this substring, we put zero. */
+        if (invSuff[i] == n-1)
+        {
+            k = 0;
+            continue;
+        }
+ 
+        /* j contains index of the next substring to
+           be considered  to compare with the present
+           substring, i.e., next string in suffix array */
+        int j = suffixArr[invSuff[i]+1];
+ 
+        // Directly start matching from k'th index as
+        // at-least k-1 characters will match
+        while (i+k<n && j+k<n && txt[i+k]==txt[j+k])
+            k++;
+ 
+        lcp[invSuff[i]] = k; // lcp for the present suffix.
+ 
+        // Deleting the starting character from the string.
+        if (k>0)
+            k--;
+    }
+ 
+    // return the constructed lcp array
+    return lcp;
+}
+
 int main()
 {
-#ifdef _DEBUG
+#ifndef _DEBUG
 	freopen("manber-myers.simple.in", "r", stdin);
 	int c, k;
 	string s;
@@ -106,10 +206,14 @@ int main()
 		cout << longestFrequent(k, s) << endl;
 	}
 #else
-	string s("alohomora");
-	auto r = getSuffixArray(s);
+	string s("banana");
+	auto sa = getSuffixArray(s);
+	auto lcp = kasai3(s, sa);
 
-	copy(begin(r), end(r), ostream_iterator<int>(cout, ", "));
+	copy(begin(sa), end(sa), ostream_iterator<int>(cout, ", "));
+	cout << endl;
+	copy(begin(lcp), end(lcp), ostream_iterator<int>(cout, ", "));
+	cout << endl;
 #endif
 
 	return 0;
