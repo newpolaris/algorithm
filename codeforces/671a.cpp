@@ -18,7 +18,7 @@ inline double dist(double ax, double ay, double bx, double by)
 int main()
 {
 #if _DEBUG
-	ifstream fin("P671A.in");
+	ifstream fin("P671a.in");
 	istream& in = fin;
 #else
 	istream& in = cin;

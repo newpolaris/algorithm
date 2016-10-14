@@ -18,7 +18,7 @@ typedef long long ll;
 int main()
 {
 #if _DEBUG
-	ifstream fin("P671B.in");
+	ifstream fin("P671b.in");
 	istream& in = fin;
 #else
 	cin.sync_with_stdio(0);

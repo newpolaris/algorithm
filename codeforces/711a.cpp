@@ -7,7 +7,7 @@ using namespace std;
 int main()
 {
 #ifdef _DEBUG
-	freopen("r711a.in", "r", stdin);
+	freopen("711a.in", "r", stdin);
 #endif
 
 	ios_base::sync_with_stdio(0); 
