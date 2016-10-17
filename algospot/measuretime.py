@@ -4,6 +4,7 @@ import gc
 input = sys.stdin.readline
 k = 1000000
 
+# Disjoint Set
 def sum(pos):
     pos += 1
     ret = 0
