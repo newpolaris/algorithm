@@ -17,17 +17,12 @@ int main() {
 	vector<int> L(n);
 	for (auto& l : L)
 		cin >> l;
-	auto LO = L;
-	if (n == 1) {
-		L.front() += max(0, k - L.front());
-	} else {
-		for (int i = 1; i < n; i++) {
-			L[i] += max(0, k - (L[i-1] + L[i]));
-		}
-	}
 	int diff = 0;
-	for (int i = 0; i < n; i++)
-		diff += L[i] - LO[i];
+	for (int i = 1; i < n; i++) {
+		int v = max(0, k - (L[i-1] + L[i]));
+		diff += v;
+		L[i] += v;
+	}
 	cout << diff << endl;
 	for (int i = 0; i < n; i++)
 		cout << L[i] << " ";
