@@ -13,12 +13,16 @@ int main() {
 
 	int k, r;
 	cin >> k >> r;
-	for (int i = 1; i < 100000000; i++) {
-		if ((k * i - r) % 10 == 0 || (k * i) % 10 == 0) {
-			cout << i << endl;
-			break;
-		}
+	k %= 10;
+	int ans = 1, x = k;
+	while (x != r && x > 0)
+	{
+		ans++;
+		x += k;
+		x %= 10;
+
 	}
+	cout << ans << endl;
 
 	return 0;
 }
