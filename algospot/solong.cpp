@@ -15,8 +15,7 @@ using TrieNodePtr = shared_ptr<TrieNode>;
 int GetKey(char ch) { return ch - 'A'; }
 
 struct TrieNode {
-	int terminal = -1;
-	int first = -1;
+	int terminal = -1, first = -1;
 	TrieNodePtr child[ALPHABET];
 
 	TrieNode() {}
