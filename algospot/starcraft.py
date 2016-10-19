@@ -8,12 +8,9 @@ def ncr(n, r):
     return numer//denom
 
 for t in xrange(input()):
-    pi, k = map(int, raw_input().split())
-    p = float(pi)/100
+    p, k = map(int, raw_input().split())
+    p = float(p)/100
     pc = 1.0 - p
-    prob = pow(p, k)
-    for i in xrange(k-1):
-        prob += ncr(k+i, k-1)*pow(p, k)*pow(pc, 1+i)
-    prob = int(round(prob*100))
-    print prob
+    prob = sum(ncr(k+i-1, i)*pow(p, k)*pow(pc,i) for i in range(k))
+    print int(round(prob*100))
     
