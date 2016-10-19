@@ -52,7 +52,7 @@ struct TrieNode {
 	}
 };
 
-// 사전을 나타내는 트라이가 주어질 때, 단어 word를 타이픙하는 데 
+// 사전을 나타내는 트라이가 주어질 때, 단어 word를 타이핑하는 데 
 // 몇 번이나 키를 눌러야 하는지 계산한다.
 int countKeys(TrieNodePtr trie, const char* word) {
 	auto node = trie->find(word);
