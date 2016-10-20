@@ -1,6 +1,5 @@
 # from fractions import gcd
 from functools import reduce
-import math
 
 
 def gcd(a, b):
@@ -14,7 +13,8 @@ for c in range(int(input())):
     p = list(map(int, input().split()))
     res = reduce(gcd, r)
     frac = [i//res for i in r]
-    ratio = max(p[i]/frac[i] for i in range(len(r)))
-    ratio = max(int(math.ceil(ratio)), 1)
-    need = [ratio*frac[i] - p[i] for i in range(len(r))]
+    # instead of ceil. it use (a-1)//b + 1
+    ratio = max((a-1)//b + 1 for a, b in zip(p, frac))
+    ratio = max(ratio, 1)
+    need = [ratio*a - b for a, b in zip(frac, p)]
     print(' '.join(str(i) for i in need))
