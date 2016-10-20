@@ -20,8 +20,9 @@ struct TrieNode {
 
 	TrieNode() {}
 	~TrieNode() {}
+
 	void insert(const char* key, int idx) {
-		if (first == -1) first = idx;
+		first = idx;
 		if (*key == 0) {
 			terminal = idx;
 		} else {
@@ -31,17 +32,17 @@ struct TrieNode {
 			child[i]->insert(key + 1, idx);
 		}
 	}
+
 	TrieNode* find(const char* word) {
 		if (*word == 0) {
-			if (terminal != -1)
-				return this;
-			return nullptr;
+			return this;
 		}
 		auto i = GetKey(*word);
 		if (child[i] == nullptr) 
 			return nullptr;
 		return child[i]->find(word+1);
 	}
+
 	// 이 노드까지 타이핑해 왔을 때, 번호 id인 key를 타이핑하기 위해
 	// 최소 몇 번의 키를 더 눌러야 하나?
 	int type(const char* key, int id) {
@@ -56,7 +57,7 @@ struct TrieNode {
 // 몇 번이나 키를 눌러야 하는지 계산한다.
 int countKeys(TrieNodePtr trie, const char* word) {
 	auto node = trie->find(word);
-	if (node == nullptr)
+	if (node == nullptr || node->terminal == -1)
 		return strlen(word);
 	return trie->type(word, node->terminal);
 }
@@ -77,7 +78,7 @@ int main() {
 			dic.push_back({-r, w});
 		}
 
-		sort(dic.begin(), dic.end());
+		sort(dic.begin(), dic.end(), greater<pair<int, string>>());
 		auto Root = make_shared<TrieNode>();
 		for (int i = 0; i < dic.size(); i++) {
 			Root->insert(dic[i].second.c_str(), i);
