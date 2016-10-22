@@ -23,12 +23,12 @@ struct TrieNode {
 	// 출력 문자열 목록: 이 노드가 방문되었을 때 등장하는 바늘 문자열들의 번호
 	vector<int> output;
 
+	// 현재 상태의 번호
 	int num = -1;
 
-	TrieNode* child[MAX_CHAR];
+	TrieNode *child[MAX_CHAR], *next[MAX_CHAR];
 	TrieNode() {
-		for (int i = 0; i < MAX_CHAR; i++)
-			child[i] = nullptr;
+		memset(child, 0, sizeof(child));
 	}
 	~TrieNode() {
 		for (int i = 0; i < MAX_CHAR; i++) {
@@ -50,16 +50,11 @@ struct TrieNode {
 
 // 트라이가 주어질 때 각 노드에 대해 실패 연결과 출력 문자열 목록을 계산한다.
 void computeFailFunc(TrieNode* root) {
-	int node_num = 0;
 	queue<TrieNode*> q;
 	root->fail = root;
 	q.push(root);
 	while (!q.empty()) {
 		auto here = q.front();
-
-		// node에 numering 부여 dp 상에서 구분하도록
-		here->num = node_num++;
-
 		q.pop();
 		// here 의 모든 자손에 대해 실패 연결을 계산하고 큐에 넣는다
 		for (int i = 0; i < MAX_CHAR; i++) {
@@ -87,6 +82,45 @@ void computeFailFunc(TrieNode* root) {
 	}
 }
 
+// 상태 간의 전의 테이블을 next[]에 채운다. computeFailFunc()를 통해
+// 이미 실패 함수가 계산되어 있다고 가정한다
+void computeTransition(TrieNode* here, int& nodeCounter) {
+	// 0 에서시작하는 번호를 매긴다: cache[]의 인덱스
+	here->num = nodeCounter++;
+
+	// here 뒤에 글자 i 를 붙였을 때 어느 상태로 가는가?
+	for (int i = 0; i < MAX_CHAR; i++) {
+		// next[] 값을 계산해 저장한다.
+		TrieNode* next = here;
+		while (next != next->fail && next->child[i] == nullptr)
+			next = next->fail;
+		if (next->child[i]) next = next->child[i];
+		here->next[i] = next;
+		// 재귀적으로 모든 노드에 대해 전이 테이블을 게산한다.
+		if (here->child[i])
+			computeTransition(here->child[i], nodeCounter);
+	}
+}
+
+// Aho-Corasick(아호-코라식)
+// trie에 포함된 패턴들을 s에서 찾는다.
+// s 내에서 패턴이 출현할 때마다 (마지막 글자, 패턴 번호)의 쌍을 저장한다.
+vector<pair<int, int>> ahoCorasick(const string& s,
+									TrieNode* root) {
+	vector<pair<int, int>> ret;
+	TrieNode* state = root;
+	// 실제 반복문 내는 KMP와 별로 다른 것이 없다.
+	for (int i = 0; i < s.size(); ++i) {
+		int ch = char2num(s[i]);
+		while (state != root && state->child[ch] == nullptr)
+			state = state->fail;
+		if (state->child[ch]) state = state->child[ch];
+		for (int j = 0; j < state->output.size(); ++j)
+			ret.push_back(make_pair(i, state->output[j]));
+	}
+	return ret;
+}
+
 const int MOD = 10007;
 int cache[101][100*10+1];
 
@@ -99,11 +133,7 @@ int count(int n, TrieNode* node) {
 	if (ret >= 0) return ret;
 	ret = 0;
 	for (int i = 0; i < MAX_CHAR; i++) {
-		auto ch = node;
-		while (ch != ch->fail && ch->child[i] == nullptr)
-			ch = ch->fail;
-		if (ch->child[i]) ch = ch->child[i];
-		ret += count(n-1, ch);
+		ret += count(n-1, node->next[i]);
 		ret %= MOD;
 	}
 	return ret;
@@ -126,7 +156,9 @@ int main() {
 			cin >> s;
 			root.insert(s.c_str(), i);
 		}
+		int num = 0;
 		computeFailFunc(&root);
+		computeTransition(&root, num);
 		cout << count(n, &root) << endl;
 	}
 
