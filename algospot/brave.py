@@ -1,3 +1,8 @@
+import sys
+
+input = sys.stdin.readline
+
+
 class DisjointSet:
     def __init__(self, n):
         self.rank = [0]*n
