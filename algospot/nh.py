@@ -23,9 +23,9 @@ class TrieNode(object):
             self.terminal = idx
         else:
             pos = self.__chr_to_idx__(ch[i])
-            if self.child[pos] is None:
-                self.child[pos] = TrieNode()
-                assert(self.child[pos] is not None)
+            next_node = self.child[pos]
+            if next_node is None:
+                next_node = self.child[pos] = TrieNode()
             self.child[pos].insert(ch, i+1, idx)
 
 
@@ -50,7 +50,7 @@ def computeFailFunc(root):
                     t = t.child[i]
                 ch.fail = t
             ch.output ^= ch.fail.output
-            if ch.terminal != -1:
+            if ch.terminal >= 0:
                 ch.output.add(ch.terminal)
             queue.append(ch)
 
