@@ -1,4 +1,4 @@
 for c in range(int(input())):
-    n = int(input())+1
-    k = sum(range(n))+1
-    print((sum(range(k))*2 + k) % 20130728)
+    n = int(input())
+    k = n*(n+1)//2+1
+    print(k**2 % 20130728)
