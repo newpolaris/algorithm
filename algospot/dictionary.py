@@ -4,24 +4,23 @@ from string import ascii_lowercase as ascii
 
 
 def dfs(now):
-    if visit[now]:
+    if vst[now]:
         return
-    visit[now] = 1
+    vst[now] = 1
     for nxt in inv.get(now, []):
         dfs(nxt)
     order.append(now)
 
 for case in range(int(input())):
     n = int(input())
-    words = [input().strip() for _ in range(n)]
+    words = [input() for _ in range(n)]
     inv = {}
-    for i in range(0, n-1):
-        for j, k in zip(words[i], words[i+1]):
-            x, y = ord(j)-ord('a'), ord(k)-ord('a')
-            if x != y:
-                inv.setdefault(k, set()).add(j)
+    for i in range(n-1):
+        for i, j in zip(words[i], words[i+1]):
+            if i != j:
+                inv.setdefault(j, set()).add(i)
                 break
-    visit = {c: 0 for c in ascii}
+    vst = {c: 0 for c in ascii}
     order = []
     for c in ascii:
         dfs(c)
