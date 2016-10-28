@@ -58,16 +58,20 @@ int main() {
 				eulercircuit(k.first);
 				// 정점이 아닌 단어가 간선 이므로
 				sol.push_back(k.second);
-				N--;
 			}
 		};
 
 		eulercircuit(s);
-
+		reverse(sol.begin(), sol.end());
 		// 단어를 전부 사용한 경우
-		if (N == 0) {
-			for (auto ri = sol.rbegin(); ri != sol.rend(); ri++)
-				cout << **ri << " ";
+		bool bSuc = sol.size() == N;
+		for (int i = 0; i < sol.size() - 1; i++) {
+			if (sol[i]->back() != sol[i+1]->front())
+				bSuc = false;
+		}
+		if (bSuc) {
+			for (auto s : sol)
+				cout << *s << " ";
 			cout << endl;
 		} else {
 			cout << "IMPOSSIBLE" << endl;
