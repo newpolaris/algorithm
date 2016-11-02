@@ -1,5 +1,6 @@
 from itertools import combinations, chain
 
+
 def false(a):
     return a*2+1
 
@@ -46,17 +47,16 @@ def tarajanSCC(adj):
 def solve2SAT(adj):
     label = tarajanSCC(adj)
     n = len(label) // 2
-    for a, b in zip(*[iter(range(2*n))]*2):
-        if label[a] == label[b]:
-            return None
+    if any(a == b for a, b in zip(*[iter(label)]*2)):
+        return None
     value = [-1] * n
     order = sorted([(-label[i], i) for i in range(2*n)])
     for i in range(2*n):
         vertex = order[i][1]
-        variable, isFalse = vertex // 2, vertex % 2
+        variable, isTrue = vertex // 2, vertex % 2 == 0
         if value[variable] != -1:
             continue
-        value[variable] = isFalse
+        value[variable] = not isTrue
     return value
 
 
