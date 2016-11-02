@@ -1,6 +1,4 @@
-from collections import defaultdict
-from itertools import combinations
-
+from itertools import combinations, chain
 
 def false(a):
     return a*2+1
@@ -10,33 +8,43 @@ def true(a):
     return a*2
 
 
-def disjoint(a, b):
-    m0, m1 = meetings[a], meetings[b]
+def disjoint(m, a, b):
+    m0, m1 = m[a], m[b]
     return m0[1] <= m1[0] or m1[1] <= m0[0]
 
 
-def scc(here):
-    global vertexCounter, sccCounter
-    vertexCounter += 1
-    ret = discovered[here] = vertexCounter
-    st.append(here)
-    for there in adj[here]:
-        if discovered[there] == -1:
-            ret = min(ret, scc(there))
-        elif sccId[there] == -1:
-            ret = min(ret, discovered[there])
-    if ret == discovered[here]:
-        while True:
-            t = st.pop()
-            sccId[t] = sccCounter
-            if t == here:
-                break
-        sccCounter += 1
-    finish[here] = 1
-    return ret
+def tarajanSCC(adj):
+    st = []
+    sccId = [-1] * len(adj)
+    discovered = [-1] * len(adj)
+
+    def scc(here):
+        global vertexCounter, sccCounter
+        vertexCounter += 1
+        ret = discovered[here] = vertexCounter
+        st.append(here)
+        for there in adj[here]:
+            if discovered[there] == -1:
+                ret = min(ret, scc(there))
+            elif sccId[there] == -1:
+                ret = min(ret, discovered[there])
+        if ret == discovered[here]:
+            while True:
+                t = st.pop()
+                sccId[t] = sccCounter
+                if t == here:
+                    break
+            sccCounter += 1
+        return ret
+
+    for i in range(len(adj)):
+        if discovered[i] == -1:
+            scc(i)
+    return sccId
 
 
-def solve2SAT(label):
+def solve2SAT(adj):
+    label = tarajanSCC(adj)
     n = len(label) // 2
     for a, b in zip(*[iter(range(2*n))]*2):
         if label[a] == label[b]:
@@ -52,36 +60,24 @@ def solve2SAT(label):
     return value
 
 
-def makeGraph():
-    adj = defaultdict(list)
-    for a, b in zip(*[iter(range(N*2))]*2):
+def makeGraph(m):
+    adj = [[] for _ in range(len(m)*2)]
+    for a, b in zip(*[iter(range(2*N))]*2):
         adj[false(a)].append(true(b))
         adj[false(b)].append(true(a))
-    for a, b in combinations(range(N*2), 2):
-        if not disjoint(a, b):
+    for a, b in combinations(range(2*N), 2):
+        if not disjoint(m, a, b):
             adj[true(a)].append(false(b))
             adj[true(b)].append(false(a))
     return adj
 
 for case in range(int(input())):
     N = int(input())
-    meetings = []
-    for _ in range(N):
-        aa, ab, ba, bb = map(int, input().split())
-        meetings.append((aa, ab))
-        meetings.append((ba, bb))
-    adj = makeGraph()
-    n4 = (4 * N)
-    # target scc
-    st = []
-    sccId = [-1] * n4
-    discovered = [-1] * n4
-    finish = [0] * n4
+    times = (map(int, input().split()) for _ in range(N))
+    meetings = list(zip(*[chain(*times)]*2))
+    adj = makeGraph(meetings)
     sccCounter = vertexCounter = 0
-    for i in range(n4):
-        if discovered[i] == -1:
-            scc(i)
-    group = solve2SAT(sccId)
+    group = solve2SAT(adj)
     if group:
         print("POSSIBLE")
         for i in range(0, 2*N, 2):
