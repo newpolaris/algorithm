@@ -3,6 +3,7 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
+#include <numeric>
 
 using namespace std;
 typedef vector<int> vi;
@@ -60,14 +61,57 @@ int perm(const vi& in)
 {
 	int index = 0;
 	int position = 1;
-	int factor = 1;
+	int factorial = 1;
+	// factorial 배열을 만들지 않기 위해 역순으로 뒤집음. 
+	// -1 은 k 가 size 넘어가므로 -2 부터
 	for (int i = in.size() - 2; i >= 0; i--) {
 		int count = 0;
 		for (int k = i + 1; k < in.size(); k++)
+			// >= 일 경우 오류남
 			if (in[i] > in[k])
 				count++;
-		index += count*factor;
-		factor *= ++position;
+		index += count*factorial;
+		factorial *= ++position;
 	}
 	return index;
 }
+
+/* NOTE: kcm's */
+int factorial[9];
+int numberit(vi& perm) {
+	int i, j, cnt, ret_val = 0;
+	int size = perm.size();
+	for(i=0; i < size; i++){
+		cnt = 0;
+		for(j = i+1; j < size; j++) {
+			if (perm[j] < perm[i]) {
+				cnt++;
+			}
+		}
+		ret_val += cnt*factorial[size-i-1];
+	}
+	return ret_val;
+}
+
+int main() {
+	factorial[0] = 1;
+	for(int i=1; i<=8; i++){
+		factorial[i] = factorial[i-1]*i;
+	}
+
+	vector<int> v(8);
+	iota(v.begin(), v.end(), 1);
+	v[1] = 1;
+	v[4] = 4;
+	copy(v.begin(), v.end(), ostream_iterator<int>(cout, " "));
+	cout << endl;
+
+	do {
+		auto a = numberit(v), b = perm(v);
+		if (a != b) {
+			cout << a << " " << b << endl;
+		}
+	} while (next_permutation(v.begin(), v.end()));
+	return 0;
+}
+
