@@ -30,7 +30,7 @@ int main() {
 				auto &p = in[i], &q = in[k];
 				int a = q.second - p.second;
 				int b = p.first - q.first;
-				int c = p.first * q.second - q.first * p.second;
+				int c = q.first * p.second - p.first * q.second;
 				int g = gcd(a, gcd(b, c));
 				lines[make_tuple(a/g, b/g, c/g)]++;
 			}
