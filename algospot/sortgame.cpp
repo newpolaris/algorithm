@@ -8,8 +8,10 @@ using namespace std;
 typedef vector<int> vi;
 
 const int maxN = 8;
-int dist[40320]; // maxN!
+int dist[40320]; // maxN! (8!)
 
+// map<vector<int>, int> 를 쓰지 않고 특정 배열에 해당하는perm 을 계산하여
+// 그 perm 을 dist 에서 할당하게 하여 map access 속도를 제거한다.
 int perm(const vi& in)
 {
 	int index = 0;
@@ -49,6 +51,8 @@ void precalc()
 		{
 			for (int j = i+2; j <= maxN; j++)
 			{
+				// reverse 두 개 쌍은 perm을 취하고 무효화 하기 위한 것으로
+				// reverse 를 직접 행하는게 save and restore 보다 빠르다
 				reverse(here.begin()+i, here.begin()+j);
 				int idxThere = perm(here);
 				if (dist[idxThere] == -1)
