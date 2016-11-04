@@ -1,3 +1,7 @@
+/*
+ * https://twitter.com/_newpolaris/status/734081468503228416
+ * 쿠폰 컬랙터 문제로 보면 간단해 진다
+ */
 // 해당 수식 증명을 위한 것
 // 5.5 / 3 에서 10만번했을 때 대략 100. 근처 값이 나온다
 //
@@ -5,7 +9,7 @@
 // http://math.stackexchange.com/questions/647587/sum-of-a-power-series-n-xn
 //
 // 확률 자체가 A,B,C 그룹만이 존재했을 때를 가정으로 풀었는데 거기에
-// 꽝이 나올 확률 즉 임의의 화률 높은 D 가 추가됬을 때도 성립한다는게 놀랍다.
+// 꽝이 나올 확률 즉 임의의 확률 D 가 추가됬을 때도 성립한다는게 놀랍다.
 //
 // Let T be the time to collect all n coupons, and let ti be the time to collect 
 // the i-th coupon after i − 1 coupons have been collected. Think of T and ti as
@@ -59,4 +63,6 @@ int main()
 
 	return 0;
 }
+
+
 
