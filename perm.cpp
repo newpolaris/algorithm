@@ -104,6 +104,29 @@ int numberit(vi& perm) {
  * 2 1 4 3
  */
 
+// p.317 순열의 사전순 번호 찾기
+int factorials[12];
+void setFactorials() {
+	factorials[0] = 1; //0!
+	for (int i = 1; i < 12; ++i) {
+		factorials[i] = factorials[i - 1] * i;
+	}
+}
+
+int getIndex(const vector<int>& X) {
+	int ret = 0;
+	for (int i = 0; i < X.size(); ++i)
+	{
+		int less = 0;
+		for (int j = i + 1; j < X.size(); ++j) {
+			if (X[i] > X[j])
+				less++;
+		}
+		ret +=  factorials[X.size() - i - 1] * less;
+	}
+	return ret;
+}
+
 int main() {
 	factorial[0] = 1;
 	for(int i=1; i<=8; i++){
@@ -123,6 +146,16 @@ int main() {
 			cout << a << " " << b << endl;
 		}
 	} while (next_permutation(v.begin(), v.end()));
+
+
+	string Num;
+	cin >> Num;
+	vector<int> numVector(Num.size());
+	for (int i = 0; i < Num.size(); ++i) {
+		numVector[i] = Num[i] - '0';
+	}
+	setFactorials();
+	int index = getIndex(numVector);
+
 	return 0;
 }
-
