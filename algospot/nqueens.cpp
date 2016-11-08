@@ -6,7 +6,8 @@
 using namespace std;
 
 const int MAX_N = 15;
-bool can(const vector<int>& board, int row, int col) {
+using vi = vector<int>;
+bool ispromising(const vi& board, int row, int col) {
 	for (int c = 0; c < col; c++) {
 		int r = board[c];
 		if (row == r) return false;
@@ -16,23 +17,15 @@ bool can(const vector<int>& board, int row, int col) {
 	return true;
 }
 
-vector<int> possible(const vector<int>& board, int col) {
-	vector<int> candi;
-	for (int row = 0; row < board.size(); row++) {
-		if (can(board, row, col))
-			candi.push_back(row);
-	}
-	return candi;
-}
-
 int dfs(vector<int>& board, int col) {
 	if (col >= board.size()) 
 		return 1;
-	auto candi = possible(board, col);
 	int sum = 0;
-	for (auto& r : candi) {
-		board[col] = r;
-		sum += dfs(board, col+1);
+	for (int row = 0; row < board.size(); row++) {
+		if (ispromising(board, row, col)) {
+			board[col] = row;
+			sum += dfs(board, col+1);
+		}
 	}
 	return sum;
 }
