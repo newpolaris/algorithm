@@ -2,29 +2,24 @@ from collections import defaultdict
 from heapq import heappop, heappush
 
 for case in range(int(input())):
-    maxn = 200
     m = int(input())
     sports = [list(map(int, input().split())) for _ in range(m)]
-    sports.sort(reverse=True)
-    adj = defaultdict(dict)
-    for i in range(-maxn+1, maxn):
-        for a, b in sports:
-            c = i + a - b
-            if abs(c) >= maxn:
-                continue
-            adj[i][c] = a
     inf = 1e10
-    dist = defaultdict(lambda: inf)
-    h = []
+    adj = defaultdict(lambda: inf)
     for a, b in sports:
-        heappush(h, (a, a - b))
+        adj[a-b] = min(adj[a-b], a)
+    dist = defaultdict(lambda: inf)
+    visit = set()
+    h = [(0, 0)]
     while h:
         t, here = heappop(h)
-        if dist[here] < t:
+        if here in visit:
             continue
-        for there, dt in adj[here].items():
-            tnext = t + dt
-            if dist[there] > tnext:
-                dist[there] = tnext
-                heappush(h, (tnext, there))
+        visit.add(here)
+        for dh, dt in adj.items():
+            there = here + dh
+            if abs(there) >= 200:
+                continue
+            dist[there] = min(dist[there], t+dt)
+            heappush(h, (t+dt, there))
     print("IMPOSSIBLE" if dist[0] == inf else dist[0])
