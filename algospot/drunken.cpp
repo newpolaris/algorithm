@@ -4,11 +4,10 @@
 
 using namespace std;
 
-const int MAX_V = 501;
-const int INF = 987654321;
-using pi=pair<int, int>;
+const int MAX_V = 500;
 int delay[MAX_V];
-pi adj[MAX_V][MAX_V];
+int adj[MAX_V][MAX_V], W[MAX_V][MAX_V];
+
 int main() {
 #ifdef _DEBUG
 	freopen("drunken.in", "r", stdin);
@@ -16,32 +15,34 @@ int main() {
 	int v, e, a, b, c, t;
 	cin >> v >> e;
 	for (int i = 0; i < v; i++)
-		cin >> delay[i];
+		 cin >> delay[i];
+	vector<pair<int, int>> order;
+	for (int i = 0; i < v; i++)
+		order.push_back(make_pair(delay[i], i));
+	sort(order.begin(), order.end());
 	for (int i = 0; i < v; i++) 
 		for (int j = 0; j < v; j++) 
-			adj[i][j] = make_pair(i == j ? 0 : INF, 0);
+			adj[i][j] = 987654321;
 	for (int i = 0; i < e; i++) {
 		cin >> a >> b >> c;
-		adj[b-1][a-1].first = adj[a-1][b-1].first = c;
+		adj[b-1][a-1] = adj[a-1][b-1] = c;
 	}
-	auto cost = [](pi a) { return a.first+a.second; };
-	auto min = [&](int i, int j, int k) {
-		auto ab = adj[i][j];
-		auto akb = make_pair(adj[i][k].first + adj[k][j].first, 
-			max(delay[k], max(adj[i][k].second, adj[k][j].second)));
-		if (cost(ab) > cost(akb)
-		 || (cost(ab) == cost(akb) && akb.second >= ab.second))
-			return akb;
-		return ab;
-	};
-	for (int k = 0; k < v; k++)
-		for (int i = 0; i < v; i++)
-			for (int j = 0; j < v; j++)
-				adj[i][j] = min(i, j, k);
+	for (int i = 0; i < v; i++) 
+		for (int j = 0; j < v; j++) 
+			W[i][j] = (i == j ? 0 : adj[i][j]);
+	for (int i = 0; i < v; i++) {
+		auto w = order[i].second;
+		auto d = order[i].first;
+		for (int i = 0; i < v; i++) 
+			for (int j = 0; j < v; j++) {
+				adj[i][j] = min(adj[i][j], adj[i][w] + adj[w][j]);
+				W[i][j] = min(W[i][j], adj[i][w] + adj[w][j] + d);
+			}
+	}
 	cin >> t;
 	for (int i = 0; i < t; i++) {
 		cin >> a >> b;
-		cout << (adj[a-1][b-1].first+adj[a-1][b-1].second) << endl;
+		cout << W[a-1][b-1] << endl;
 
 	}
 	return 0;
