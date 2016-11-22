@@ -1,7 +1,8 @@
 from itertools import combinations
+import sys
 
 
-input = raw_input
+input = sys.stdin.readline
 
 for cese in range(int(input())):
     n, m = map(int, input().split())
@@ -13,10 +14,9 @@ for cese in range(int(input())):
     for _ in range(m):
         a, b = map(int, input().split())
         adj[a][b] = adj[b][a] = 0
-    minWeight = [987654321]*n
-    minWeight[0] = 0
+    minWeight = [1e10]*n
+    dist = minWeight[0] = 0.0
     added = [False]*n
-    dist = 0.0
     for _ in range(n):
         u = -1
         for i in range(n):
