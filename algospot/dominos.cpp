@@ -4,7 +4,7 @@
 using namespace std;
 
 const int MAX_M = 80, inf = 100000, ADJ_L = MAX_M*MAX_M/2;
-int m, n, cm, cn, r, c;
+int R, C, m, n, r, c;
 int id[MAX_M][MAX_M];
 int adj[ADJ_L][ADJ_L];
 int dx[] = { 0, 0, 1, -1};
@@ -13,7 +13,7 @@ vector<bool> visited;
 vector<int> aMatch, bMatch;
 
 bool inRange(int x, int y) {
-	if (0 <= x && x < n && 0 <= y && y < m) 
+	if (0 <= x && x < C && 0 <= y && y < R) 
 		return true;
 	return false;
 }
@@ -21,7 +21,7 @@ bool inRange(int x, int y) {
 bool dfs(int a) {
 	if (visited[a]) return false;
 	visited[a] = true;
-	for (int b = 0; b < cn; b++) {
+	for (int b = 0; b < n; b++) {
 		if (adj[a][b]) {
 			if (bMatch[b] == -1 || dfs(bMatch[b])) {
 				aMatch[a] = b;
@@ -34,11 +34,11 @@ bool dfs(int a) {
 }
 
 int bipartileMatch() {
-	aMatch = vector<int>(cm, -1);
-	bMatch = vector<int>(cn, -1);
+	aMatch = vector<int>(m, -1);
+	bMatch = vector<int>(n, -1);
 	int cnt = 0;
-	for (int i = 0; i < cm; i++) {
-		visited = vector<bool>(cm, false);
+	for (int i = 0; i < m; i++) {
+		visited = vector<bool>(m, false);
 		if (dfs(i))
 			cnt++;
 	}
@@ -54,22 +54,22 @@ int main() {
 	char ch;
 	cin >> c;
 	while (c--) {
-		cm = cn = 0;
-		cin >> m >> n;
+		m = n = 0;
+		cin >> R >> C;
 		memset(adj, 0, sizeof(adj));
 		memset(id, -1, sizeof(id));
-		for (int r = 0; r < m; r++) {
-		for (int c = 0; c < n; c++) {
+		for (int r = 0; r < R; r++) {
+		for (int c = 0; c < C; c++) {
 			cin >> ch;
 			if (ch == '#') continue;
 			if ((r+c) % 2 == 0)
-				id[r][c] = cm++;
+				id[r][c] = m++;
 			else
-				id[r][c] = cn++;
+				id[r][c] = n++;
 		}
 		}
-		for (int r = 0; r < m; r++) { 
-		for (int c = 0; c < n; c++) {
+		for (int r = 0; r < R; r++) { 
+		for (int c = 0; c < C; c++) {
 			if ((r+c) % 2 == 1 || id[r][c] == -1)
 				continue;
 			for (int i = 0; i < 4; i++) {
@@ -79,7 +79,7 @@ int main() {
 			}
 		}
 		}
-		cout << ((bipartileMatch()*2 == cn+cm) 
+		cout << ((bipartileMatch()*2 == n+m) 
 				? "POSSIBLE" : "IMPOSSIBLE") << endl;
 	}
 
