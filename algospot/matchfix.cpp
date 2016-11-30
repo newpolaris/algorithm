@@ -35,7 +35,7 @@ int networkFlow(int w) {
 			}
 		}
 		if (parent[sink] == -1) break;
-		int amount = m;
+		int amount = 1;
 		for (int p = sink; p != source; p = parent[p])
 			amount = min(capacity[parent[p]][p] - flow[parent[p]][p], amount);
 		for (int p = sink; p != source; p = parent[p]) {
