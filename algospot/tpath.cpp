@@ -63,6 +63,7 @@ int main() {
 			cin >> a >> b >> v;
 			weight[i] = v;
 			adj[a].push_back({b, v});
+			adj[b].push_back({a, v});
 		}
 		cout << binarySearchMinUpperBound() << endl;
 	}
