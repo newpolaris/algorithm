@@ -1,6 +1,6 @@
-f = open("boardcover2.in")
-input = f.readline
-
+# f = open("boardcover2.in")
+# input = f.readline
+input = raw_input
 
 def rotate(A):
     B = [[0]*len(A) for _ in range(len(A[0]))]
@@ -44,8 +44,11 @@ def Set(y, x, rot, add):
     return bSuc
 
 
-def search(placed):
+def search(placed, used):
     global best
+    remain = Blanks - (used + placed*blockSize)
+    if remain//blockSize + placed <= best:
+        return
     y, x = -1, -1
     for i in range(R):
         for j in range(C):
@@ -59,10 +62,10 @@ def search(placed):
         return
     for rot in rotations:
         if Set(y, x, rot, 1):
-            search(placed+1)
+            search(placed+1, used)
         Set(y, x, rot, -1)
     Board[y][x] = 1
-    search(placed)
+    search(placed, used+1)
     Board[y][x] = 0
     return placed
 
@@ -71,7 +74,8 @@ for case in range(int(input())):
     R, C, BR, BC = map(int, input().split())
     Board = [[1 if c == '#' else 0 for c in input()] for r in range(R)]
     Block = [[1 if c == '#' else 0 for c in input()] for r in range(BR)]
+    Blanks = R*C - sum([sum(line) for line in Board])
     rotations, blockSize = generateRotations(Block)
     best = 0
-    search(0)
+    search(0, 0)
     print(best)
