@@ -6,10 +6,6 @@ def transpose(block):
     return list(zip(*block))
 
 
-def binarize(cell):
-    return cell > 0
-
-
 def revert_rotate(t):
     i, j, c = t
     return (N-i, N-j, 0, c)
@@ -36,20 +32,18 @@ for t in range(T):
     N = int(input())
     board = [list(map(int, input().split())) for _ in range(N)]
 
+    print(N)
+    print('\n'.join(' '.join(map(lambda c: '01'[c > 0], row)) for row in board))
+
     # 180 deg rototation
     rotated = rotate(rotate(board))
     transposed = transpose(rotated)
 
-    binary = [list(map(binarize, row)) for row in board]
-    hint = list(map(revert_rotate, [t for t in get_hint(rotated)]))
-    hint += list(map(revert_transpose, [t for t in get_hint(transposed)]))
-    hint.sort(key=lambda x: (x[2], x[0], x[1]))
+    hints = list(map(revert_rotate, [t for t in get_hint(rotated)]))
+    hints += list(map(revert_transpose, [t for t in get_hint(transposed)]))
 
-    print(N)
-    for row in binary:
-        for c in row:
-            print(1 if c else 0, end=" ")
-        print()
-    print(len(hint))
-    for i, j, d, v in hint:
+    hints.sort(key=lambda x: (x[2], x[0], x[1]))
+
+    print(len(hints))
+    for i, j, d, v in hints:
         print(i, j, d, v)
