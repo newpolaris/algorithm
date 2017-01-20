@@ -81,6 +81,7 @@ namespace hash {
 }
 
 int main() {
+
 	hash::HashTable h(10);
 	std::vector<int> v(10);
 	h.insert(Key(), 10);
