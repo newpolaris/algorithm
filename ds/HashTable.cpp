@@ -2,7 +2,7 @@
 #include <vector>
 #include <list>
 #include <cassert>
-#include <experimental/optional>
+#include <boost/optional.hpp>
 
 namespace test {
 	using std::cout;
@@ -27,8 +27,8 @@ using Val=int;
 namespace hash {
 	using std::list;
 	using std::vector;
-	using std::experimental::nullopt;
-	using std::experimental::optional;
+	using boost::optional;
+	using boost::none;
 	const int LoadFactor = 5;
 
 	class HashTable {
@@ -43,7 +43,7 @@ namespace hash {
 		// if already exist return false
 		// else true
 		bool insert(std::pair<Key, Val>&& p) {
-			if (find(p.first) != nullopt) 
+			if (find(p.first) != none) 
 				return false;
 
 			auto k = Hash(p.first);
@@ -56,22 +56,26 @@ namespace hash {
 			return 0;
 		}
 
-		// optional test
-		optional<Val> find(const Key& key) {
-			auto k = Hash(key);
-			auto& chain = table_[k].list_;
-			for (auto& c : chain) {
-				if (c.first == key) 
-					// null value
-					return nullopt; 
-			}
-			return k;
-		}
-
 	public:
 		HashTable(int size) {
 			table_.resize(size/LoadFactor);
 		}
+
+		// optional test
+		optional<Val&> find(const Key& key) {
+			auto k = Hash(key);
+			auto& chain = table_[k].list_;
+			for (auto& c : chain) {
+				if (c.first == key) {
+					// https://goo.gl/FO9J6i
+					// optional reference binding : portability issue
+					return c.second;
+				}
+			}
+			// null value
+			return none; 
+		}
+
 
 		// public insert function can handle rvalue-reference
 		bool insert(Key&& key, int data) {
@@ -103,7 +107,10 @@ int main() {
 
 	hash::HashTable h(10);
 	std::vector<int> v(10);
-	h.insert(Key(), 10);
+	h.insert(Key(), 5);
+	auto t = h.find(Key());
+	if (t.is_initialized()) 
+		t.get() = 10;
 
 	return 0;
 }
