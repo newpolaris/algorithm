@@ -22,6 +22,7 @@ namespace test {
 
 // Temp
 using Key=int;
+using Val=int;
 
 namespace hash {
 	using std::list;
@@ -32,7 +33,7 @@ namespace hash {
 
 	class HashTable {
 	private:
-		using Node = std::pair<Key, int>;
+		using Node = std::pair<Key, Val>;
 		struct HashTableNode {
 			list<Node> list_;
 		};
@@ -41,9 +42,10 @@ namespace hash {
 
 		// if already exist return false
 		// else true
-		bool insert(std::pair<Key, int>&& p) {
+		bool insert(std::pair<Key, Val>&& p) {
 			if (find(p.first) != nullopt) 
 				return false;
+
 			auto k = Hash(p.first);
 			auto& chain = table_[k].list_;
 			chain.push_front(p);
@@ -54,11 +56,13 @@ namespace hash {
 			return 0;
 		}
 
-		optional<int> find(const Key& key) {
+		// optional test
+		optional<Val> find(const Key& key) {
 			auto k = Hash(key);
 			auto& chain = table_[k].list_;
 			for (auto& c : chain) {
 				if (c.first == key) 
+					// null value
 					return nullopt; 
 			}
 			return k;
@@ -69,14 +73,29 @@ namespace hash {
 			table_.resize(size/LoadFactor);
 		}
 
+		// public insert function can handle rvalue-reference
 		bool insert(Key&& key, int data) {
 			return insert(std::make_pair(key, data));
 		}
 
+		// public insert function can handle const lvalue
 		bool insert(const int& key, int data) {
 			return insert(std::make_pair(key, data));
 		}
 
+		bool remove(const Key& key) {
+			auto k = Hash(key);
+			auto& chain = table_[k].list_;
+			for (auto iter = chain.begin();
+				 iter != chain.end();
+				 ++iter) {
+				if (iter->first == key) {
+					iter = chain.erase(iter);
+					return true;
+				}
+			}
+			return false;
+		}
 	};
 }
 
