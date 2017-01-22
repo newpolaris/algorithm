@@ -19,21 +19,13 @@ namespace test {
 			k_ = h.k_;
 			cout << k_ << " COPY" << endl;
 		}
-		Test(Test&& h) {
-			std::swap(k_, h.k_);
-			cout << k_ << " MOVE C" << endl;
+		Test(Test&& h) : k_(0) {
+			*this = std::move(h);
+			cout << " MOVE C" << endl;
 		}
-		Test& operator=(Test&& h) {
-			if (this != &h)  
-			{  
-				std::swap(k_, h.k_);
-				cout << k_ << " MOVE A" << endl;
-			}
-			return *this;
-		}
+		Test& operator=(Test&&) = default;
 	};
 	bool operator==(const Test& a, const Test& b) { return a.k_ == b.k_; }
-
 }
 
 namespace std {
@@ -53,6 +45,7 @@ namespace hashtable {
 	template <typename Key>
 	int Hash(const Key& key) {
 		int h = std::hash<Key>{}(key);
+		// from java hash mix. (c++ ref example h ^ (h << 1))
 		return (h ^ (h >> 16));
 	}
 
@@ -66,23 +59,6 @@ namespace hashtable {
 		};
 		int count_ = 0;
 		vector<HashTableNode> table_;
-
-		// if already exist return false
-		// else true
-		bool insert(Node&& p) {
-			if (find(p.first) != nullptr) 
-				return false;
-
-			auto k = index(p.first);
-			auto& chain = table_[k].list_;
-			chain.push_front(std::move(p));
-			count_++;
-
-			if (count_ / table_.size() > LoadFactor)
-				rehash();
-
-			return true;
-		}
 
 		int index(const Key& key, int size) {
 			return Hash(key) % size;
@@ -124,6 +100,22 @@ namespace hashtable {
 			return nullptr; 
 		}
 
+		// if already exist return false
+		// else true
+		bool insert(Node&& p) {
+			if (find(p.first) != nullptr) 
+				return false;
+
+			auto k = index(p.first);
+			auto& chain = table_[k].list_;
+			chain.push_front(std::move(p));
+			count_++;
+
+			if (count_ / table_.size() > LoadFactor)
+				rehash();
+
+			return true;
+		}
 
 		// public insert function can handle rvalue-reference
 		bool insert(Key&& key, int data) {
