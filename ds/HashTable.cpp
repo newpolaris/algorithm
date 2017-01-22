@@ -46,12 +46,12 @@ namespace std {
 	};
 }
 
-namespace hash {
+namespace hashtable {
 	using std::list;
 	using std::vector;
 
 	template <typename Key>
-	int hash(const Key& key) {
+	int Hash(const Key& key) {
 		int h = std::hash<Key>{}(key);
 		return (h ^ (h >> 16));
 	}
@@ -85,7 +85,7 @@ namespace hash {
 		}
 
 		int index(const Key& key, int size) {
-			return hash(key) % size;
+			return Hash(key) % size;
 		}
 		int index(const Key& key) {
 			return index(key, table_.size());
@@ -113,10 +113,6 @@ namespace hash {
 			table_.resize(1 + size/LoadFactor);
 		}
 
-		Val* find(Key&& key) {
-			return find(key);
-		}
-
 		Val* find(const Key& key) {
 			int k = index(key);
 			auto& chain = table_[k].list_;
@@ -135,7 +131,7 @@ namespace hash {
 		}
 
 		// public insert function can handle const lvalue
-		bool insert(const int& key, int data) {
+		bool insert(const Key& key, int data) {
 			return insert(std::make_pair(key, data));
 		}
 
@@ -152,6 +148,22 @@ namespace hash {
 			}
 			return false;
 		}
+
+		Val& operator[](const Key& key) {
+			int k = index(key);
+			auto& chain = table_[k].list_;
+			for (auto& c : chain) {
+				if (c.first == key) {
+					return c.second;
+				}
+			}
+			return insert(std::make_pair(key, Val())).first->second;
+		}
+
+		void clear() {
+			table_.clear();
+			count_ = 0;
+		}
 	};
 }
 
@@ -159,7 +171,7 @@ int main() {
 	using Key=test::Test;;
 	using Val=int;
 
-	hash::HashTable<test::Test, int> h(1);
+	hashtable::HashTable<Key, Val> h(1);
 	h.insert(Key(1), 10);
 	h.insert(Key(2), 9);
 	assert(h.find(Key(2)) != nullptr);
