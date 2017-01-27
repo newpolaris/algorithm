@@ -7,8 +7,5 @@
 using namespace std;
 
 int main() {
-#ifdef _DEBUG
-	freopen("762c.in", "r", stdin);
-#endif
 	return 0;
 }
