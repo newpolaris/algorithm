@@ -33,7 +33,7 @@ int main() {
 			cnt++; c--; total += m.first;
 		}
 	}
-
+	cout << cnt << " " << total << endl;
 
 	return 0;
 }

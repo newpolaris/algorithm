@@ -22,7 +22,7 @@ int main() {
 	}
 	sort(l.begin(), l.end());
 	vector<ll> div(l.begin(), unique(l.begin(), l.end()));
-	cout << (div.size() < k ? div[k] : -1) << endl;
+	cout << (div.size() >= k ? div[k-1] : -1) << endl;
 
 	return 0;
 }
