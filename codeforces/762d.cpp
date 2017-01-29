@@ -1,83 +1,88 @@
-#include <cstdio>
-#include <algorithm>
-#include <vector>
 #include <iostream>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+#include <string.h>
+
+#define REP(i, a, b) for (int i = (a), i##_end_ = (b); i < i##_end_; ++i)
+#define debug(...) fprintf(stderr, __VA_ARGS__)
+#define mp make_pair
+#define x first
+#define y second
+#define pb push_back
+#define SZ(x) (int((x).size()))
+#define ALL(x) (x).begin(), (x).end()
+
+template<typename T> inline bool chkmin(T &a, const T &b) { return a > b ? a = b, 1 : 0; }
+template<typename T> inline bool chkmax(T &a, const T &b) { return a < b ? a = b, 1 : 0; }
 
 using namespace std;
-#define PB push_back
-#define ZERO (1e-10)
-#define INF (1<<29)
-#define CL(A,I) (memset(A,I,sizeof(A)))
-#define DEB printf("DEB!\n");
-#define D(X) cout<<"  "<<#X": "<<X<<endl;
-#define EQ(A,B) (A+ZERO>B&&A-ZERO<B)
-typedef long long ll;
-typedef long double ld;
-typedef pair<ll,ll> pll;
-typedef vector<int> vi;
-typedef pair<int,int> ii;
-typedef vector<ii> vii;
-#define IN(n) int n;scanf("%d",&n);
-#define FOR(i, m, n) for (int i(m); i < n; i++)
-#define REP(i, n) FOR(i, 0, n)
-#define F(n) REP(i, n)
-#define FF(n) REP(j, n)
-#define FT(m, n) FOR(k, m, n)
-#define aa first
-#define bb second
-void ga(int N,ll *A){F(N)scanf("%lld",A+i);}
-#define MX (6)//100009)
-int N;
 
-ll dp[MX][3][2],g[4][MX];
+const int maxn = 100001;
+using ll = long long;
+const ll inf = 1e18;
+ll dp[maxn][3];
+ll a[maxn][3];
+ll colsum[maxn];
+int n;
 
-// u is col
-// I is row
-// y is flag on/off
-ll dyn(int u, int I, bool y){
-	if(u > N) 
-		return -1e18;
-	if(u == N) {
-		ll r = (y || I^2) ? -1e18 : 0;
-		return r;
+// 돌아간다는 연산을 버리고 모든 가능한 path 를 generate 하면 된다.
+ll path(int r, int c) {
+	if (c > n) 
+		return -inf;
+	if (c == n)
+		return (r == 2) ? 0 : -inf;
+
+	ll& ret = dp[c][r];
+	if (ret != -1)
+		return ret;
+
+	ret = -inf;
+
+	/* generate all path */
+	// simple (c fixed, r change) after increase c+1
+	ll coladd = 0;
+	REP(i, r, 3) { // 단순 오른쪽 1칸, 아래로 여러칸 후 오른쪽 1칸
+		coladd += a[c][i];
+		ret = max(ret, path(i, c+1)+coladd);
 	}
-	ll& v = dp[u][I][y];
-	if (~v) 
-		return v;
-	v = -1e18;
-	if (y) 
-		return v = g[3][u] + max(dyn(u+1, I, 1), dyn(u+1, I, 0));
-
-	// u 현재 col 을 따라 target y 까지 내려간 후 오른쪽으로 1칸을 진행했을 때의 cost 계산
-	ll S = 0;
-	FOR(k, I, 3) {
-		S += g[k][u];
-		v = max(v, dyn(u+1, k, 0) + S);
-	}
-	// u 현재 col 을 따라 target y 까지 올라간 후 오른쪽으로 1칸을 진행했을 때의 cost 계산
-	S = 0;
-	for (int k = I; ~k; --k) {
-		S += g[k][u];
-		v = max(v, dyn(u+1, k, 0) + S);
+	coladd = 0;
+	for (int i = r; i >= 0; i--) { // 단순 오른쪽 1칸, 위로 여러칸 후 오른쪽 1칸
+		coladd += a[c][i];
+		ret = max(ret, path(i, c+1)+coladd);
 	}
 
-	// if I != 1 일 때 I 가 0 이면 2로, 2면 0로 보내는데 y flag를 switch 시킴
-	if (I ^ 1)
-		v = max(v, dyn(u+1, I ? 0 : 2, 1) + g[3][u]);
-	return v;
+	// cover path that can't handle in above case
+	// https://s29.postimg.org/6nb8g5u6f/20170126_161450.jpg
+	// 위에 걸로 대부분 방향을 generate 가능하나, 0 혹은 2 위치에서
+	// 'ㄹ' 모양으로 움직이면 'r' 이 뒤집힌다.
+	// 이러한 'ㄹ' 자 움직임은 2칸이상이면 자유롭게 움직일 수 있다.
+	// 1칸은 위의 단순 case 로 인해 방향 바꾸는 연산이 커버되므로
+	// 일반적인 2칸의 경우만 처리하면 2+2 는 4칸, 2+1은 3칸 이런식으로
+	// 알아서 커버 된다.
+	if (r != 1 && c+1 < n) {
+		ret = max(ret, path(r == 0 ? 2 : 0, c+2) + colsum[c] + colsum[c+1]);
+	}
+
+	return ret;
 }
 
-int main(void){
+int main() {
 #ifdef _DEBUG
 	freopen("762d.in", "r", stdin);
 #endif
-	scanf("%d",&N),CL(dp,-1);
-	REP(i, 3)
-		ga(N,g[i]);
-	REP(i, N) {
-		REP(j, 3) 
-			g[3][i] += g[j][i];
-	}
-	cout << dyn(0,0,0) << endl;
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	cin >> n;
+	REP(j, 0, 3)
+		REP(i, 0, n)
+			cin >> a[i][j];
+
+	REP(i, 0, n) 
+		colsum[i] = a[i][0]+a[i][1]+a[i][2];
+
+	memset(dp, -1, sizeof(dp));
+	cout << path(0, 0) << endl;
+
 	return 0;
 }
