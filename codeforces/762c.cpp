@@ -42,24 +42,24 @@ int main() {
 	int maxcnt = -1; 
 	pair<int, int> maxidx;
 
-	// a 범위에 따라갈 pre/suf의 next를 가르키는 pointer
-	int pi = 0;
-	int si = distance(suf.begin(), max_element(suf.begin(), suf.end()));
+	int la = a.size();
 
-	// a 의 범위를 변화시키며 pre/suf 중 각각에 주고 maximum 을 찾는다
-	for (int i = 0; i < a.size(); i++) {
-		int pre_range = i;
-		int suf_range = a.size() - i;
-		if (pi < b.size() && pre[pi] < pre_range) 
-			pi += 1;
-		while (si >= 0 && (suf[si] > suf_range || b.size()-suf[si]-1 < pre[pi])) 
-			si -= 1;
-		if (maxcnt < si+pi+1) {
-			maxcnt = si+pi+1;
-			maxidx = {pi, si+1};
+	// a에서 잘려질 범위를 변형시켜 pre/suf 중 각각에 주고 maximum 을 찾는다
+	for (int i = 0; i <= la; i++) {
+		auto pre_limit = i;
+		auto suf_limit = la - i;
+		auto pit = find_if(pre.begin(), pre.end(), [&](int k) { return k >= pre_limit; });
+		auto pcnt = distance(pre.begin(), pit);
+		auto sit = find_if(suf.begin(), suf.end(), [&](int k) { return k >= suf_limit; });
+		auto scnt = distance(suf.begin(), sit);
+		auto cnt = pcnt+scnt;
+		if (cnt > maxcnt) {
+			maxcnt = cnt;
+			maxidx = {pcnt, scnt};
 		}
 	}
-	auto r = b.substr(0, maxidx.first) + b.substr(b.size()-maxidx.second, maxidx.second);
+	auto suf_st = max(maxidx.first, (int)b.size()-maxidx.second);
+	auto r = b.substr(0, maxidx.first) + b.substr(suf_st, maxidx.second);
 	cout << (r.empty() ? "-" : r) << endl;
 
 	return 0;
