@@ -9,20 +9,21 @@ typedef long long ll;
 
 int main() {
 #ifdef _DEBUG
+	freopen("762a.in", "r", stdin);
 #endif
 	ll n, k;
 	cin >> n >> k;
 
 	vector<ll> l;
-	for (ll a = 1; a <= sqrt(n); a++) {
+	for (ll a = 1; a*a <= n; a++) {
 		if (n % a == 0) {
 			l.push_back(a);
-			l.push_back(n/a);
+			if (n/a != a)
+				l.push_back(n/a);
 		}
 	}
 	sort(l.begin(), l.end());
-	vector<ll> div(l.begin(), unique(l.begin(), l.end()));
-	cout << (div.size() >= k ? div[k-1] : -1) << endl;
+	cout << (l.size() >= k ? l[k-1] : -1) << endl;
 
 	return 0;
 }
