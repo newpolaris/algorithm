@@ -4,6 +4,18 @@
 #include <algorithm>
 #include <string>
 
+#define REP(i, a, b) for (int i = (a), i##_end_ = (b); i < i##_end_; ++i)
+#define debug(...) fprintf(stderr, __VA_ARGS__)
+#define mp make_pair
+#define x first
+#define y second
+#define pb push_back
+#define SZ(x) (int((x).size()))
+#define ALL(x) (x).begin(), (x).end()
+
+template<typename T> inline bool chkmin(T &a, const T &b) { return a > b ? a = b, 1 : 0; }
+template<typename T> inline bool chkmax(T &a, const T &b) { return a < b ? a = b, 1 : 0; }
+
 using namespace std;
 
 int main() {
@@ -12,59 +24,33 @@ int main() {
 #endif
 	string a, b;
 	cin >> a >> b;
-	const int inf = a.size() + 5;
-	vector<int> pre(b.size(), inf), suf(b.size(), inf);
-	for (int i = 0; i < b.size(); i++) {
-		int c = i == 0 ? 0 : pre[i-1]+1;
-		while (c < a.size()) {
-			if (a[c] == b[i])
-				break;
-			c++;
-		}
-		if (c >= a.size()) 
-			break;
-		pre[i] = c;
+
+	int n = a.size();
+	int m = b.size();
+	vector<int> pre(n+1), suf(n+1);
+	pre[0] = 0;
+	REP(i, 0, n) {
+		pre[i+1] = pre[i];
+		if (pre[i] < m && a[i] == b[pre[i]]) pre[i+1]++;
+	}
+	suf[n] = 0;
+	for (int i = n-1; i >= 0; i--) {
+		suf[i] = suf[i+1];
+		if (suf[i] < m && a[i] == b[m-1-suf[i]]) suf[i]++; 
 	}
 
-	for (int i = 0; i < b.size(); i++) {
-		int c = i == 0 ? 0 : suf[i-1]+1;
-		while (c < a.size()) {
-			if (a[a.size()-c-1] == b[b.size()-i-1])
-				break;
-			c++;
-		}
-		if (c >= a.size()) 
-			break;
-		suf[i] = c;
-	}
-
-	// max matching count, index
-	int maxcnt = -1; 
-	pair<int, int> maxidx;
-
-	int la = a.size();
-	auto pit = pre.begin();
-	auto sit = suf.rbegin();
-
-	// a에서 잘려질 범위를 변형시켜 pre/suf 중 각각에 주고 maximum 을 찾는다
-	for (int i = 0; i <= la; i++) {
-		auto pre_limit = i;
-		auto suf_limit = la - i;
-		while (pit != pre.end() && *pit < pre_limit) pit++;
-		auto pcnt = distance(pre.begin(), pit);
-		while ((sit+1) != suf.rend() && *(sit+1) >= suf_limit) { 
-			sit++;
-		}
-		auto scnt = suf.size() - distance(suf.rbegin(), sit) - 1;
-		int cnt = pcnt+scnt;
-		if (cnt > maxcnt) {
-			maxcnt = cnt;
-			maxidx = {pcnt, scnt};
+	int maxcnt = -1, maxidx = -1;
+	REP(i, 0, n+1) {
+		if (chkmax(maxcnt, pre[i]+suf[i])) {
+			maxidx = i;
 		}
 	}
-	auto suf_st = max(maxidx.first, (int)b.size()-maxidx.second);
-	auto r = b.substr(0, maxidx.first) + b.substr(suf_st, maxidx.second);
-	cout << (r.empty() ? "-" : r) << endl;
+
+	if (!maxcnt) puts("-"); 
+	else {
+		REP(i, 0, pre[maxidx]) putchar(b[i]);
+		REP(i, max(pre[maxidx], m-suf[maxidx]), m) putchar(b[i]);
+	}
 
 	return 0;
 }
