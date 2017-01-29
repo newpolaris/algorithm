@@ -43,16 +43,20 @@ int main() {
 	pair<int, int> maxidx;
 
 	int la = a.size();
+	auto pit = pre.begin();
+	auto sit = suf.rbegin();
 
 	// a에서 잘려질 범위를 변형시켜 pre/suf 중 각각에 주고 maximum 을 찾는다
 	for (int i = 0; i <= la; i++) {
 		auto pre_limit = i;
 		auto suf_limit = la - i;
-		auto pit = find_if(pre.begin(), pre.end(), [&](int k) { return k >= pre_limit; });
+		while (pit != pre.end() && *pit < pre_limit) pit++;
 		auto pcnt = distance(pre.begin(), pit);
-		auto sit = find_if(suf.begin(), suf.end(), [&](int k) { return k >= suf_limit; });
-		auto scnt = distance(suf.begin(), sit);
-		auto cnt = pcnt+scnt;
+		while ((sit+1) != suf.rend() && *(sit+1) >= suf_limit) { 
+			sit++;
+		}
+		auto scnt = suf.size() - distance(suf.rbegin(), sit) - 1;
+		int cnt = pcnt+scnt;
 		if (cnt > maxcnt) {
 			maxcnt = cnt;
 			maxidx = {pcnt, scnt};
