@@ -6,7 +6,7 @@
 using namespace std;
 
 typedef long long ll;
-ll mat[101][101];
+ll remaining[101][101];
 
 int main() {
 #ifdef _DEBUG
@@ -14,39 +14,38 @@ int main() {
 #endif
 	ll n, m, x, y, k;
 	cin >> n >> m >> k >> x >> y;
-	ll N = n+n-1-1;
-	if (n == 1) N = 1;
-	if (n == 2) N = 2;
-	ll basec = k / (N*m);
-	ll r = k % (N*m);
+
+	// one period T
+	ll T = (n == 1) ? m : n*m + (n-2)*m;
+	ll repeat = k / T;
+	ll remain = k % T;
+
+	// place remainder
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
-			if (i == 0 || i == n-1)
-				mat[i][j] = basec;
-			else
-				mat[i][j] = basec*2;
-		}
-	}
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {
-			if (r - 1 >= 0) { mat[i][j] += 1; r--; }
+			if (remain - 1 >= 0) {
+				remaining[i][j] += 1;
+				remain--; 
+			}
 		}
 	}
 	for (int i = n-2; i >= 0; i--) {
 		for (int j = 0; j < m; j++) {
-			if (r - 1 >= 0) { mat[i][j] += 1; r--; }
+			if (remain - 1 >= 0) {
+				remaining[i][j] += 1; 
+				remain--; 
+			}
 		}
 	}
 
-	ll minV = numeric_limits<ll>::max();
-	ll maxV = 0;
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {
-			minV = min(minV, mat[i][j]);
-			maxV = max(maxV, mat[i][j]);
-		}
-	}
+	auto f = [&](int _y, int _x) {
+		ll factor = (_y == 0 || _y == n-1) ? 1 : 2;
+		ll ret = repeat * factor;
+		return ret + remaining[_y][_x];
+	};
 
+	auto maxV = max(max(f(0, 0), f(1, 0)), f(n-2, 0));
+	auto minV = f(n-1, m-1);
 	
-	cout << maxV<< " " << minV << " " << mat[x-1][y-1] << endl;
+	cout << maxV<< " " << minV << " " << f(y-1, x-1) << endl;
 }
