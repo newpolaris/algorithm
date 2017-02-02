@@ -11,17 +11,18 @@ using namespace std;
 
 int main() {
 #ifdef _DEBUG
-	freopen("764c0.in", "r", stdin);
+	freopen("764c.in", "r", stdin);
 #endif
 	int n, a, b;
 	cin >> n;
-	vector<pair<int, int>> link(n);
-	for (auto& l : link)
-		cin >> l.x >> l.y;
+	vector<pair<int, int>> link(n-1);
+	for (auto& l : link) {
+		cin >> a >> b;
+		l.x = a - 1;
+		l.y = b - 1;
+	}
 	vector<int> color(n);
 	for (auto& c : color) cin >> c;
-
-	vector<pair<int, int>> rootcandi;
 
 	map<int, int> cnt;
 	for (auto& l : link) {
@@ -30,14 +31,20 @@ int main() {
 			cnt[l.y] += 1;
 		}
 	}
-	vector<int> root;
+	vector<int> rootcandi;
 	for (auto& c : cnt) {
 		if (c.y > 1)
-			root.push_back(c.x);
+			rootcandi.push_back(c.x);
 	}
-	if (root.size() == 1) {
+	if (rootcandi.size() <= 0) {
+		if (cnt.size() > 0)
+			rootcandi.push_back((*cnt.begin()).x);
+		else
+			rootcandi.push_back(0);
+	}
+	if (rootcandi.size() == 1) {
 		cout << "YES" << endl;
-		cout << root[0] << endl;
+		cout << (rootcandi[0]+1) << endl;
 	} else {
 		cout << "NO" << endl;
 	}
