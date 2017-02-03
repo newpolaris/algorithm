@@ -11,8 +11,9 @@ using namespace std;
 
 int main() {
 #ifdef _DEBUG
-	freopen("764c.in", "r", stdin);
+	freopen("764c0.in", "r", stdin);
 #endif
+    ios_base::sync_with_stdio(false);
 	int n, a, b;
 	cin >> n;
 	vector<pair<int, int>> link(n-1);
@@ -33,18 +34,31 @@ int main() {
 	}
 	vector<int> rootcandi;
 	for (auto& c : cnt) {
-		if (c.y > 1)
+		if (c.y > 0)
 			rootcandi.push_back(c.x);
 	}
-	if (rootcandi.size() <= 0) {
-		if (cnt.size() > 0)
-			rootcandi.push_back((*cnt.begin()).x);
-		else
-			rootcandi.push_back(0);
+	if (rootcandi.size() <= 0)
+		rootcandi.push_back(link[0].x);
+
+	int root = -1;	
+	for (auto r : rootcandi) { 
+		bool bCorrect = true;
+		for (auto& l : link) {
+			if (color[l.x] != color[l.y]) {
+				if (l.x == r || l.y == r) continue;
+				else {
+					bCorrect = false;
+					break;
+				}
+			}
+		}
+		if (bCorrect) {
+			root = r;
+		}
 	}
-	if (rootcandi.size() == 1) {
+	if (root != -1) {
 		cout << "YES" << endl;
-		cout << (rootcandi[0]+1) << endl;
+		cout << (root+1) << endl;
 	} else {
 		cout << "NO" << endl;
 	}
