@@ -20,7 +20,9 @@ bool split(int l, int r, int a) {
 	} else {
 		for (int i = r; i >= l; i--) {
 			if (sum[i] != 0) {
-				if (split(l, i-1, a) && split(i, r, a - sum[i-1]))
+				// reculsive는 필요치 않다. 그냥 넣어도 된다.
+				// arr(l, i) + arr(i+1, r) == 0 and arr(l, i) != 0 then arr(i+1, r) != 0
+				if (split(l, i, a) && split(i+1, r, a - sum[i]))
 					return true;
 			}
 		}
