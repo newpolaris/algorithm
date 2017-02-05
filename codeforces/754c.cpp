@@ -22,6 +22,7 @@
 #include <iostream>
 #include <regex>
 #include <cassert>
+#include <set>
 
 #define ALL(x) (x).begin(), (x).end()
 #define REP(i, a, b) for (int i = (a), i##_end_ = (b); i < i##_end_; ++i)
@@ -71,8 +72,12 @@ void solve() {
 			continue;
 		} else {
 			canUse[i] = vector<bool>(n, true);
+			auto token = split(body, "[^A-Za-z0-9]+");
+			set<string> tokens(
+					make_move_iterator(token.begin()), 
+					make_move_iterator(token.end()));
 			for (int k = 0; k < n; k++) {
-				if (string::npos != body.find(names[k]))
+				if (tokens.find(names[k]) != tokens.end())
 					canUse[i][k] = false;
 			}
 		}
@@ -120,7 +125,7 @@ void solve() {
 
 int main() {
 #ifdef _DEBUG
-	freopen("754c.in", "r", stdin);
+	freopen("754c2.in", "r", stdin);
 #endif
 	int t; // number of tests
 	cin >> t; 
