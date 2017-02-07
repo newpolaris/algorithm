@@ -10,6 +10,8 @@
 #define ALL(x) (x).begin(), (x).end()
 #define REP(i, a, b) for (int i = (a), i##_end_ = (b); i < i##_end_; ++i)
 #define SZ(x) (int((x).size()))
+#define x first
+#define y second 
 
 using namespace std;
 
@@ -27,12 +29,23 @@ int main() {
 	cin >> n >> m;
 	vector<string> pass(n);
 	for (auto& s : pass) cin >> s;
-	priority_queue<pair<int, pair<int, int>>> que;
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {
+	vector<vector<pair<int,int>>> typeDist(3);
+	REP(i, 0, n) {
+		REP(j, 0, m) {
 			int dist = min(j, m - j);
-			que.push({dist, {0, type(pass[i][j])}});	
+			typeDist[type(pass[i][j])].push_back({dist, i});
 		}
 	}
-
+	REP(i, 0, 3) sort(ALL(typeDist[i]));
+	int minDist = m*n;
+	for (auto i : typeDist[0]) {
+		for (auto j : typeDist[1]) {
+			if (i.y == j.y) continue;
+			for (auto k : typeDist[2]) {
+				if (j.y == k.y || i.y == k.y) continue;
+				minDist = min(minDist, i.x + j.x + k.x);
+			}
+		}
+	}
+	cout << minDist << endl;
 }
