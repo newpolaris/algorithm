@@ -29,21 +29,21 @@ int main() {
 	cin >> n >> m;
 	vector<string> pass(n);
 	for (auto& s : pass) cin >> s;
-	vector<vector<pair<int,int>>> typeDist(3);
+	vector<vector<int>> typeDist(3, vector<int>(m, n));
 	REP(i, 0, n) {
 		REP(j, 0, m) {
 			int dist = min(j, m - j);
-			typeDist[type(pass[i][j])].push_back({dist, i});
+			int t = type(pass[i][j]);
+			typeDist[t][i] = min(dist, typeDist[t][i]);
 		}
 	}
-	REP(i, 0, 3) sort(ALL(typeDist[i]));
 	int minDist = m*n;
-	for (auto i : typeDist[0]) {
-		for (auto j : typeDist[1]) {
-			if (i.y == j.y) continue;
-			for (auto k : typeDist[2]) {
-				if (j.y == k.y || i.y == k.y) continue;
-				minDist = min(minDist, i.x + j.x + k.x);
+	REP(i, 0, typeDist[0].size()) {
+		REP(j, 0, typeDist[1].size()) {
+			if (i == j) continue;
+			REP(k, 0, typeDist[2].size()) {
+				if (j == k || i == k) continue;
+				minDist = min(minDist, typeDist[0][i] + typeDist[1][j] + typeDist[2][k]);
 			}
 		}
 	}
