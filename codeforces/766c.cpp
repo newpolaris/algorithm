@@ -28,10 +28,9 @@ const int MOD = 1000000007;
 // 한 부분 substring의 최대 길이
 int maxL = 0;
 // 1,2 번 용
-typedef int Int;
-Int cache[1001][1001];
+int cache[1001];
 // 3번 용
-int cache2[1001][1001];
+int cache2[1001];
 
 // 참고로, 모든게 가능 할 때의 갯수는 각 부분을 나누거나, 나누지 않거나 2^(n-1) 개임
 
@@ -51,20 +50,21 @@ int valid(int s, int l) {
 	return 1;
 }
 
-Int dp(int s, int l) {
-	if (l == 0) return 1;
-	Int& ret = cache[s][l];
+int dp(int s) {
+	// 기본 1개 a는 통과했으므로
+	if (s >= n) return 1;
+	int& ret = cache[s];
 	if (ret >= 0) 
 		return ret;
 	ret = 0;
 	// 1:n-1, 2:n-2 의 갯수를 센다
-	for (int i = 1; i <= l; i++) {
+	for (int i = 1; i <= n - s; i++) {
 		// dp(s, i)를 계산해서 곱하면 중복이 발생하므로,
 		// prefix를 고정으로 두고 나머지를 계산
 		auto a = valid(s, i);
 		if (a == 0) continue;
 		// a는 고정된 1개 방식이므로 b 만 더하면 됨. 1*b = b
-		auto b = dp(s+i, l-i) % MOD;
+		auto b = dp(s+i) % MOD;
 		ret += b;
 		// 더하고 나머지 하지
 		ret %= MOD;
@@ -72,17 +72,16 @@ Int dp(int s, int l) {
 	return ret;
 }
 
-int dp2(int s, int l) {
-	if (l == 0) 
-		return 0;
-	int& ret = cache2[s][l];
+int dp2(int s) {
+	if (s >= n) return 0;
+	int& ret = cache2[s];
 	if (ret >= 0) 
 		return ret;
 	ret = 1001;
-	for (int i = 1; i <= l; i++) {
+	for (int i = 1; i <= n - s; i++) {
 		auto a = valid(s, i);
 		if (a == 0) continue;
-		auto cnt = 1 + dp2(s+i, l-i);
+		auto cnt = 1 + dp2(s+i);
 		ret = min(cnt, ret);
 	}
 	return ret;
@@ -99,8 +98,8 @@ int main() {
 	cin >> str;
 	for (auto& a : alpha)
 		cin >> a;
-	cout << dp(0, n) << endl;
+	cout << dp(0) << endl;
 	cout << maxL << endl;
-	cout << dp2(0, n) << endl;
+	cout << dp2(0) << endl;
 	return 0;
 }
