@@ -21,6 +21,11 @@ DisjointSet::DisjointSet(int n)
 	for (int i = 0; i < n; i++)
 		parent[i] = i;
 	rank = vector<int>(n, 0);
+	/*
+	   rank.assign(n, 0);
+	   parent.resize(n);
+	   iota(parent.begin(), parent.end(), 0);
+	*/
 }
 
 // here 가 속한 트리의 루트의 번호를 반환한다.
