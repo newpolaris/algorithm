@@ -6,12 +6,20 @@
 #include <limits>
 #include <string.h>
 #include <regex>
+#include <iterator>
 
-#define ALL(x) (x).begin(), (x).end()
-#define forn(i, a, b) for (int i = (a), i##_end_ = (b); i < i##_end_; ++i)
-#define SZ(x) (int((x).size()))
+#define all(x) (x).begin(), (x).end()
+#define sz(x) (int((x).size()))
+#define rep(i, a, b) for (int i = (a), i##_end_ = (b); i < i##_end_; ++i)
+#define irep(i, a, b) for (int i = (a)-1, i##_end_ = (b); i >= i##_end_; --i)
 
 using namespace std;
+
+template <class T, class S> ostream& operator<<(ostream& os, const pair<T, S>& v) { return os << "(" << v.first << ", " << v.second << ")"; }
+template <class T> ostream& operator<<(ostream& os, const vector<T>& v) { os << "["; rep(i, 0, sz(v)) { if(i) os << ", "; os << v[i]; } return os << "]"; }
+template <class T> bool setmax(T& _a, T _b) { if(_a < _b) { _a = _b; return true; } return false; }
+template <class T> bool setmin(T& _a, T _b) { if(_b < _a) { _a = _b; return true; } return false; }
+template <class T> T gcd(T _a, T _b) { return _b == 0 ? _a : gcd(_b, _a % _b); }
 
 int main() {
 #ifdef _DEBUG
@@ -21,25 +29,19 @@ int main() {
 	cin >> n;
 	string wd;
 	cin >> wd;
-	forn(k, 0, n) {
-		int l = wd.size();
-		forn(i, 0, l-2) {
-			if (wd.substr(i, 3) == "ogo") {
-				forn(j, 0, 3) 
-					wd[j+i] = '*';
-				break;
+	int i = 0;
+	while (i < n) {
+		if (wd.substr(i, 3) == "ogo") {
+			i += 3;
+			while (wd.substr(i, 2) == "go") {
+				i += 2;
 			}
-		}
-		forn(t, 0, n) {
-			l = wd.size();
-			forn(i, 0, l-2) {
-				if (wd.substr(i, 3) == "*go") {
-					wd = wd.substr(0, i+1) + wd.substr(i+3);
-					break;
-				}
-			}
+			cout << "***";
+		} else {
+			cout << wd[i];
+			i += 1;
 		}
 	}
-	cout << wd << endl;
+	cout << endl;
 	return 0;
 }
