@@ -5,6 +5,7 @@
 
 using namespace std;
 
+// tag: dp
 int main() {
 	int c[501][501], t[501][501];
 	int n;

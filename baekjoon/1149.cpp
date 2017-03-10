@@ -8,6 +8,8 @@ using namespace std;
 int house[1000][3];
 int c[1000][3];
 
+// tag: dp
+
 int main() {
 #ifdef _DEBUG
 	freopen("1149.in", "r", stdin);

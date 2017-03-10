@@ -21,6 +21,7 @@ template <class T> bool setmax(T& _a, T _b) { if(_a < _b) { _a = _b; return true
 template <class T> bool setmin(T& _a, T _b) { if(_b < _a) { _a = _b; return true; } return false; }
 template <class T> T gcd(T _a, T _b) { return _b == 0 ? _a : gcd(_b, _a % _b); }
 
+// tag: Fail, fail, dp
 int main() {
 #ifdef _DEBUG
 	freopen("1563.in", "r", stdin);
