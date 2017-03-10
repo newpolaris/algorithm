@@ -10,6 +10,8 @@
 
 using namespace std;
 
+// tag: Fail, fail, dp
+
 int main() {
 #ifdef _DEBUG
 	freopen("2156.in", "r", stdin);
@@ -90,6 +92,7 @@ int main() {
 	c[2] = max(c[1], max(a[0]+a[2], a[1]+a[2]));
 	for (int i = 3; i < n; i++) {
 		c[i] = max(c[i-2], c[i-3] + a[i-1]) + a[i];
+		//  최대값 갱신,  algospot packing 과 마찬가지
 		c[i] = max(c[i-1], c[i]);
 	}
 	cout << c[n-1] << endl;
