@@ -1,100 +1,49 @@
-#include <algorithm>
 #include <iostream>
-#include <string.h>
+#include <algorithm>
 #include <string>
+#include <string.h>
 #include <vector>
-#include <fstream>
 
 using namespace std;
 
-struct Object
-{
-	string name;
-	float W;
-	float V;
-};
-
-vector<Object> List;
-int Cache[1001][101];
-
-int Optimize(int BagSize, int Idx)
-{
-	if (BagSize == 0) 
-		return 0;
-	if (Idx >= List.size())
-		return 0;
-	int& caR = Cache[BagSize][Idx];
-	if (caR > 0)
-		return caR;
-	int L = 0;
-	if (BagSize - List[Idx].W >= 0)
-		L = List[Idx].V + Optimize(BagSize - List[Idx].W, Idx+1);
-	int R = Optimize(BagSize, Idx+1);
-
-	int MaxV = max(L, R);
-	caR = MaxV;
-	return caR;
-}
-
-vector<int> Select;
-
-void Recontruct(int w, int i)
-{
-	if (i >= List.size())
-		return;
-
-	bool bCurrentSelected = true;
-	if (w - List[i].W < 0)
-		bCurrentSelected = false;
-	else
-		bCurrentSelected = !(Cache[w][i] == Cache[w][i+1]);
-
-	if (bCurrentSelected)
-	{
-		Select.push_back(i);
-		Recontruct(w-List[i].W, i+1);
-	}
-	else
-	{
-		Recontruct(w, i+1);
-	}
-}
+int dp[101][1001];
 
 int main() {
 #ifdef _DEBUG
 	freopen("packing.in", "r", stdin);
 #endif
-	int T, C, V;
-	int B;
-	cin >> T;
+	int t, c, v, n, w;
+	cin >> c;
 
-	while (T--) {
-		cin >> C >> B;
-
-		memset(&Cache, 0, sizeof(Cache));
-
-		Select.clear();
-		List.clear();
-
-		while (C--) {
-			Object obj;
-
-			cin >> obj.name;
-			cin >> obj.W;
-			cin >> obj.V;
-
-			List.push_back(obj);
+	while (c--) {
+		memset(dp, 0, sizeof(dp));
+		cin >> n >> w;
+		vector<string> name(n);
+		vector<int> vol(n), need(n);
+		for (int i = 0; i < n; i++)
+			cin >> name[i] >> vol[i] >> need[i];
+		// 상품 하나에 대해 모든 돈의 경우를 채우는 방식
+		for (int k = 1; k <= n; k++) {
+			for (int i = 0; i <= w; i++) {
+				int& r = dp[k][i];
+				// 사용 안했을 경우의 최대값 유지
+				r = dp[k-1][i];
+				if (i - vol[k-1] < 0) continue;
+				// 사용 했을 때 만족도 갱신
+				r = max(r, dp[k-1][i - vol[k-1]] + need[k-1]);
+			}
 		}
-
-		int MaxV = Optimize(B, 0);
-		Recontruct(B, 0);
-
-		cout << MaxV << " " << Select.size() << endl;
-
-		for (int i = 0; i < Select.size(); i++)
-		{
-			cout << List[Select[i]].name << endl;
+		int remainW = w;
+		vector<int> sol;
+		for (int i = n-1; i >= 0; --i) {
+			if (dp[i+1][remainW] == dp[i][remainW]) 
+				continue;
+			sol.push_back(i);
+			remainW -= vol[i];
 		}
+		cout << dp[n][w] << " " << sol.size() << endl;
+		for (auto i : sol)
+			cout << name[i] << endl;
 	}
 
 	return 0;
