@@ -6,6 +6,9 @@ int max(int a, int b) {
 	return a > b ? a : b;
 }
 int main() {
+#ifdef _DEBUG
+	freopen("9465.in", "r", stdin);
+#endif
 	int t, n;
 	scanf("%d", &t);
 	while (t--) {
