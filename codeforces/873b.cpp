@@ -19,5 +19,17 @@ int main()
 	cin >> n;
 	string s;
 	cin >> s;
-	int cache[100000][100000];
+	std::vector<int> balance(n+1);
+	balance[0] = 0;
+	for (int i = 1; i <= n; i++)
+		balance[i] = balance[i-1] + int(s[i] == '0');
+	const int inf = int(1e7+1);
+	std::vector<int> minIndex(n+1, inf);
+	for (int i = 0; i <= n; i++)
+		minIndex[balance[i]] = min(minIndex[balance[i]], i);
+	int sol = 0;
+	for (int i = 1; i <= n; i++)
+		sol = max(sol, i - minIndex[balance[i]]);
+	cout << sol << endl;
+	return 0;
 }
