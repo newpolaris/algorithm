@@ -1,3 +1,8 @@
+#include <vector>
+#include <stack>
+
+using namespace std;
+
 // 그래프의 인접 리스트 표현
 vector<vector<int> > adj;
 

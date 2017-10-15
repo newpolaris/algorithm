@@ -1,6 +1,6 @@
 /* 
  * http://www.practice.geeksforgeeks.org/problem-page.php?pid=1439
- * Longest Comon Sustring을 DP로 찾는 방법 O(n*m)
+ * Longest Comon Sustring(LCS, lcs)을 DP로 찾는 방법 O(n*m)
  * 단순히, 아래 판별식을 이용한다.
  * LCSuff(x, y, m, n) = LCSuff(x, y, m-1, n-1) + 1 if x[m-1] = y[n-1]
  *                       0  Otherwise (if x[m-1] != y[n-1])
