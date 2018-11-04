@@ -59,6 +59,15 @@ struct BipartiteUnionFind {
 		if (b != -1) enemy[b] = a;
 		return true;
 	}
+
+	// 확인만 한다, 같은 집합 0, 다르면 1, 모르겠으면 2
+	int check(int a, int b) {
+		a = find(a), b = find(b);
+		if (a == b) return 0;
+		auto ea = enemy[a], eb = enemy[b];
+		if (a == eb) return 1;
+		return 2;
+	}
 };
 
 int main()
