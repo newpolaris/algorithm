@@ -39,6 +39,7 @@ int main() {
 	}
 
 	auto f = [&](int _y, int _x) {
+		if (_y < 0 || _y >= n) _y = 0;
 		ll factor = (_y == 0 || _y == n-1) ? 1 : 2;
 		ll ret = repeat * factor;
 		return ret + remaining[_y][_x];
@@ -47,5 +48,5 @@ int main() {
 	auto maxV = max(max(f(0, 0), f(1, 0)), f(n-2, 0));
 	auto minV = f(n-1, m-1);
 	
-	cout << maxV<< " " << minV << " " << f(y-1, x-1) << endl;
+	cout << maxV<< " " << minV << " " << f(x-1, y-1) << endl;
 }

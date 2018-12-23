@@ -33,7 +33,57 @@ int main() {
 	 * <=> (h(gh)g)(x) = f(f(x))
 	 * <=> (hg)(x) = f(f(x)) where (gh)(x) = x = (I)(x)
 	 * <=> f(f(x)) = f(x)
+	 *
+	 * 이거 말고도 h 만 취한다면?
+	 * h(g(h(x))) = (hgh)(x) = h(x)
+	 * <=> (fh)(x) = h(x)
+	 *
+	 * g를 취한다면?
+	 * (ghg)(x) = (gf)(x)
+	 * <=> g(x) = g(f(x))
+	 *
+	 * 그냥 있는 것으로 부터
+	 * (gh)(x) = x, (hg) = f(x)
 	 */
+	/*
+	 *
+#include<cstdio>
+#include<cstring>
+
+int n,m,i,j,f[100005],g[100005],h[100005];
+
+int main()
+{
+	scanf("%d",&n);
+	m=0;
+	for(i=1;i<=n;++i)
+	{
+		scanf("%d",&f[i]);
+		if(f[i]==i)
+		{
+			g[i]=(++m);
+			h[g[i]]=i;
+		}
+	}
+	for(i=1;i<=n;++i)
+	{
+		if(f[i]==i)continue;
+		if(f[i]!=i)
+		{
+			if(f[i]!=f[f[i]])break;
+			g[i]=g[f[i]];
+		}
+	}
+	if(i>n)
+	{
+		printf("%d\n",m);
+		for(i=1;i<n;++i)printf("%d ",g[i]);
+		printf("%d\n%d",g[n],h[1]);
+		for(i=2;i<=m;++i)printf(" %d",h[i]);
+	}else printf("-1");
+	return 0;
+}
+*/
 	bool bExist = true;
 	for (int i = 1; i <= n; i++) {
 		if (f[i] <= n && f[f[i]] == f[i])
@@ -45,7 +95,7 @@ int main() {
 		cout << -1 << endl;
 		return 0;
 	}
-
+	
 	// 0 부분 제거
 	f.erase(f.begin());
 

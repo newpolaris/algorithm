@@ -23,13 +23,13 @@ int type(char c) {
 
 int main() {
 #ifdef _DEBUG
-	freopen("761c0.in", "r", stdin);
+	freopen("761c.in", "r", stdin);
 #endif
 	int n, m;
 	cin >> n >> m;
 	vector<string> pass(n);
 	for (auto& s : pass) cin >> s;
-	vector<vector<int>> typeDist(3, vector<int>(m, n));
+	vector<vector<int>> typeDist(3, vector<int>(n, m));
 	REP(i, 0, n) {
 		REP(j, 0, m) {
 			int dist = min(j, m - j);
