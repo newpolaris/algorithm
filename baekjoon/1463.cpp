@@ -1,20 +1,17 @@
-#include <iostream>
-#include <iomanip>
-#include <stdio.h>
-#include <vector>
-
-using namespace std;
+#include <cstdio>
+int min(int a, int b) {
+    return a <= b ? a : b;
+}
 int main() {
-	ios::sync_with_stdio(0);
-	vector<int> c(int(1e6)+2, int(1e10));
-	c[1] = 0;
-	int n;
-	cin >> n;
-	for (int i = 1; i <= n; i++) { 
-		c[i+1] = min(c[i+1], c[i]+1);
-		if (i*2 < c.size()) c[i*2] = min(c[i*2], c[i]+1);
-		if (i*3 < c.size()) c[i*3] = min(c[i*3], c[i]+1);
+    int n, c[1'000'000];
+	c[1] = 0, c[2] = 1, c[3] = 1;
+    scanf("%d", &n);
+	for (int i = 4; i <= n; i++) { 
+        int t = c[i-1];
+        if (i % 2 == 0) t = min(c[i/2], t);
+        if (i % 3 == 0) t = min(c[i/3], t);
+        c[i] = t + 1;
 	}
-	cout << c[n] << endl;
+    printf("%d\n", c[n]);
 	return 0;
 }

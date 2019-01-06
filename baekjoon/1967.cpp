@@ -1,6 +1,7 @@
 #include <vector>
 #include <cstdio>
 #include <algorithm>
+
 int n, a, b, w;
 struct child { int c, w, d; };
 std::vector<child> node[10'001];
