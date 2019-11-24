@@ -14,7 +14,9 @@ int main() {
 #endif
     scanf("%d %d", &k, &n);
     for (int i = 0; i < k; i++) scanf("%d", &lines[i]);
-#if 0
+#if 1
+    // lo 가 -1 이면 0을 테스트하다가 0 div
+    //        0 이면 0은 테스트 하지 않고 답으로 0으로 나와준다; 더 편함
     int64_t lo = 0, hi = (1u << 31);
     while (lo + 1 < hi) {
         int64_t mid = (hi + lo) / 2;
