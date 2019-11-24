@@ -50,17 +50,23 @@ binary_search(lo, hi, p):
 
 // jongman 5.1 binary_search
 // n > max available( 10이 가능 최대라면 11을 넣어야;)
-// lo 가 -1 이면 0을 테스트하다가 0 div
-//        0 이면 0은 테스트 하지 않고 답으로 0으로 나와준다; 더 편함
+//
+// (boj:1300) - (lo:1 + 1 < hi:2) 이러면 테스트 안하게 되고, hi가 2로 나온다
+//               lo = 0, hi = max+1
 int binarysearch(const vector<int>& A, int x) {
     int n = A.size();
+    // 0 이 min value (lo:-1 + 1 < hi:1) -> mid:0 (작으면 hi:0 답 0, 크면 hi:1 - 범위 벗어나네)
     int lo = -1, hi = n;
     while (lo + 1 < hi) {
         int mid = (lo + hi) / 2;
         if (A[mid] < x)
-            lo = min;
+            lo = mid;
         else
-            hi = mid
+            hi = mid;
     }
     return hi;
 }
+
+// 10815.cpp - 같은 수 찾기
+// 1654.cpp - 최대 길이 찾기
+// 1300.cpp - k랑 같은 범위 찾기
